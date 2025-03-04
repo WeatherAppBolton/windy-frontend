@@ -1,0 +1,76 @@
+<!-- page1.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    
+  <meta charset="UTF-8">
+  <title>Weather App - Page 2</title>
+
+  <style>
+
+    /* Styling the page similarly to page1 */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* The container for the second page */
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    /* Center the title */
+    h1 {
+      text-align: center;
+    }
+
+    /* A highlight class for special text */
+    .highlight {
+      color: #2ddb2a; /* Matching green used on page1 */
+      font-weight: bold; /* Setting font style */
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Another container for layout consistency -->
+  <div class="container">
+    <h1>Weather App - Results</h1>
+    <!-- Update this p with the username and location when API is linked-->
+    <p id="greeting">Loading data...</p>
+
+  </div>
+
+  <script>
+
+    // Retrieving the stored values 
+    const storedName = localStorage.getItem('username');
+    const storedLocation = localStorage.getItem('location');
+
+    // Grabbing the paragraph element
+    const greetingElement = document.getElementById('greeting');
+
+    // If both username and location data available, display them
+    if (storedName && storedLocation) {
+      greetingElement.innerHTML = `Welcome, <span class="highlight">${storedName}</span>!<br><br>
+        The weather in <span class="highlight">${storedLocation}</span> is .......... <br><br>
+        <em>(Waiting for weather API. Come Back Later!)</em>`;
+    } 
+    
+    else {
+      // If no data was found, prompt the user to go back
+      greetingElement.textContent = 'No user data found. Please go back and enter your details.';
+    }
+
+  </script>
+
+</body>
+</html>
