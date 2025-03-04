@@ -1,0 +1,121 @@
+<!-- page1.html -->
+<!DOCTYPE html>
+<html>
+<head>
+
+  <!-- Character encoding for the HTML document -->
+  <meta charset="UTF-8">
+
+  <!-- Title that appears in the browser tab -->
+  <title>Weather App - Page 1</title>
+
+  <!-- Embedded CSS for basic styling -->
+  <style>
+
+    /* Style the entire page body */
+    body {
+      font-family: Arial, sans-serif;  
+      background-color: #f0f0f0;     
+      margin: 0;                     
+      padding: 20px;                
+    }
+
+    /* A container class to keep content centered and styled nicely */
+    .container {
+      max-width: 500px;                 
+      margin: 50px auto;                
+      background-color: #fff;          
+      padding: 20px;                    
+      border-radius: 8px;               
+      box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+    }
+
+    /* Style for the main heading */
+    h1 {
+      text-align: center;   
+    }
+
+    /* Style for form labels */
+    label {
+      display: block;        
+      margin: 10px 0 5px;    
+    }
+
+    /* Style for text input fields */
+    input {
+      width: 100%;           
+      padding: 8px;         
+      margin-bottom: 15px;   
+      border: 1px solid #ccc; 
+      border-radius: 4px;   
+    }
+
+    /* Style for the button */
+    button {
+      background-color: #2ddb2a; 
+      color: white;              
+      padding: 10px 15px;         
+      border: none;             
+      border-radius: 4px;        
+      cursor: pointer;           
+      font-size: 16px;            
+    }
+
+    /*Button color to change slightly on hover */
+    button:hover {
+      background-color: #45a049;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- A div to hold everything in a nice white box -->
+  <div class="container">
+    <h1>Welcome to the Weather App</h1>
+    <p>Please enter your name and the location you'd like to check:</p>
+
+    <!-- Label for the username input field -->
+    <label for="username">Name:</label>
+    <input type="text" id="username" placeholder="e.g. Mohit" required>
+
+    <!-- Label for the location input field -->
+    <label for="location">Location:</label>
+    <input type="text" id="location" placeholder="e.g. India" required>
+
+    <!--  Button to save the data and go to Page 2 -->
+    <button id="submitBtn">Search</button>
+
+  </div>
+
+  <!-- JavaScript to handle storing user input -->
+  <script>
+
+    // Grabbing the button by its ID
+    const submitButton = document.getElementById('submitBtn');
+
+    // Add a click event listener to the button
+    submitButton.addEventListener('click', () => {
+      // Get the value from the username field
+      const userName = document.getElementById('username').value;
+      // Get the value from the location field
+      const userLocation = document.getElementById('location').value;
+
+      // If either field is empty, alert the user and stop
+      if (!userName || !userLocation) {
+        alert('Please fill out both fields!');
+        return;
+      }
+
+      // Storing the values in localStorage so they can be accessed on page2
+      localStorage.setItem('username', userName);
+      localStorage.setItem('location', userLocation);
+
+      // Navigate to page2
+      window.location.href = 'page2.html';
+    });
+
+  </script>
+
+</body>
+</html>
