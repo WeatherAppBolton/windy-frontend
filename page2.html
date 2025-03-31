@@ -1,13 +1,11 @@
-<!-- page1.html -->
+<!-- page2.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    
   <meta charset="UTF-8">
   <title>Windy - Page 2</title>
 
   <style>
-
     /* Styling the page similarly to page1 */
     body {
       font-family: Arial, sans-serif;
@@ -33,10 +31,9 @@
 
     /* A highlight class for special text */
     .highlight {
-      color: #2ddb2a; /* Matching green used on page1 */
-      font-weight: bold; /* Setting font style */
+      color: #2ddb2a;
+      font-weight: bold;
     }
-
   </style>
 </head>
 <body>
@@ -44,32 +41,46 @@
   <!-- Another container for layout consistency -->
   <div class="container">
     <h1>Weather App - Results</h1>
-    <!-- Update this p with the username and location when API is linked-->
+    <!-- This element will be updated dynamically with the user's data -->
     <p id="greeting">Loading data...</p>
-
   </div>
 
   <script>
-
-    // Retrieving the stored values 
+    // Retrieve user data from localStorage
     const storedName = localStorage.getItem('username');
     const storedLocation = localStorage.getItem('location');
 
-    // Grabbing the paragraph element
+    // Reference to the paragraph element to display results
     const greetingElement = document.getElementById('greeting');
 
-    // If both username and location data available, display them
+    // Lambda endpoint URL (replace with your actual API Gateway URL)
+    const lambdaUrl = "https://j69ymxtksk.execute-api.eu-north-1.amazonaws.com/weather"; 
+
+    // If both name and location are available, call the weather API
     if (storedName && storedLocation) {
-      greetingElement.innerHTML = `Welcome, <span class="highlight">${storedName}</span>!<br><br>
-        The weather in <span class="highlight">${storedLocation}</span> is .......... <br><br>
-        <em>(Waiting for weather API. Come Back Later!)</em>`;
-    } 
-    
-    else {
-      // If no data was found, prompt the user to go back
+      fetch(`${lambdaUrl}?location=${storedLocation}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`API call failed: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Update the greeting with real temperature
+          greetingElement.innerHTML = `
+            Welcome, <span class="highlight">${storedName}</span>!<br><br>
+            The weather in <span class="highlight">${storedLocation}</span> is
+            <span class="highlight">${data.temperature}°C</span>.
+          `;
+        })
+        .catch(error => {
+          // Show error message if something goes wrong
+          greetingElement.innerHTML = `Something went wrong: ${error}`;
+        });
+    } else {
+      // Handle missing data
       greetingElement.textContent = 'No user data found. Please go back and enter your details.';
     }
-
   </script>
 
 </body>
