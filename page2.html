@@ -6,7 +6,7 @@
   <title>Windy - Page 2</title>
 
   <style>
-    /* Styling the page similarly to page1 */
+    /* Base page styling */
     body {
       font-family: Arial, sans-serif;
       background-color: #f0f0f0;
@@ -14,7 +14,7 @@
       padding: 20px;
     }
 
-    /* The container for the second page */
+    /* Main content container */
     .container {
       max-width: 500px;
       margin: 50px auto;
@@ -22,27 +22,59 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
     }
 
-    /* Center the title */
+    /* Title styling */
     h1 {
       text-align: center;
     }
 
-    /* A highlight class for special text */
+    /* Highlighted dynamic text */
     .highlight {
       color: #2ddb2a;
       font-weight: bold;
+    }
+
+    /* Styled button to go back to homepage */
+    .back-button {
+      margin-top: 30px;
+      padding: 10px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #218838;
+    }
+
+    /* Error styling */
+    .error-message {
+      color: #d9534f;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    .error-detail {
+      color: #555;
+      font-size: 14px;
+      margin-top: 10px;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
 
-  <!-- Another container for layout consistency -->
   <div class="container">
     <h1>Windy App - Results</h1>
-    <!-- This element will be updated dynamically with the user's data -->
     <p id="greeting">Loading data...</p>
+    <button class="back-button" onclick="goBack()">← Go back to Home</button>
   </div>
 
   <script>
@@ -53,8 +85,13 @@
     // Reference to the paragraph element to display results
     const greetingElement = document.getElementById('greeting');
 
-    // Lambda endpoint URL (replace with your actual API Gateway URL)
-    const lambdaUrl = "https://j69ymxtksk.execute-api.eu-north-1.amazonaws.com/weather"; 
+    // Lambda endpoint URL (replace with your real API Gateway URL)
+    const lambdaUrl = "https://j69ymxtksk.execute-api.eu-north-1.amazonaws.com/weather";
+
+    // Function to return to page1.html
+    function goBack() {
+      window.location.href = "page1.html";
+    }
 
     // If both name and location are available, call the weather API
     if (storedName && storedLocation) {
@@ -66,19 +103,33 @@
           return response.json();
         })
         .then(data => {
-          // Update the greeting with real temperature
-          greetingElement.innerHTML = `
-            Welcome, <span class="highlight">${storedName}</span>!<br><br>
-            The weather in <span class="highlight">${storedLocation}</span> is
-            <span class="highlight">${data.temperature}°C</span>.
-          `;
+          // If the city is not found or there's an API error
+          if (data.error || data.message === "city not found") {
+            greetingElement.innerHTML = `
+              <div class="error-message">
+                Sorry, <span class="highlight">${storedName}</span>!<br><br>
+                The location <span class="highlight">${storedLocation}</span> could not be found.<br><br>
+                Please try another city.
+              </div>
+            `;
+          } else {
+            // If data is valid, show the result
+            greetingElement.innerHTML = `
+              Welcome, <span class="highlight">${storedName}</span>!<br><br>
+              The weather in <span class="highlight">${storedLocation}</span> is
+              <span class="highlight">${data.temperature}°C</span>.
+            `;
+          }
         })
         .catch(error => {
-          // Show error message if something goes wrong
-          greetingElement.innerHTML = `Something went wrong: ${error}`;
+          // Display network or other fetch-related errors
+          greetingElement.innerHTML = `
+            <div class="error-message">Oops! Something went wrong:</div>
+            <div class="error-detail">${error.message}</div>
+          `;
         });
     } else {
-      // Handle missing data
+      // If localStorage has no data, show fallback
       greetingElement.textContent = 'No user data found. Please go back and enter your details.';
     }
   </script>
