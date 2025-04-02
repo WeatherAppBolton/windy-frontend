@@ -1,138 +1,120 @@
-<!-- page2.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Windy - Page 2</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windy - Weather Results</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f6d365, #fda085); /* consistent with page1 */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-  <style>
-    /* Base page styling */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      margin: 0;
-      padding: 20px;
-    }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
 
-    /* Main content container */
-    .container {
-      max-width: 500px;
-      margin: 50px auto;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-    /* Title styling */
-    h1 {
-      text-align: center;
-    }
+        #greeting {
+            font-size: 18px;
+            margin-top: 20px;
+            color: #444;
+        }
 
-    /* Highlighted dynamic text */
-    .highlight {
-      color: #2ddb2a;
-      font-weight: bold;
-    }
+        .highlight {
+            color: #f78b00;
+            font-weight: bold;
+        }
 
-    /* Styled button to go back to homepage */
-    .back-button {
-      margin-top: 30px;
-      padding: 10px 25px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      background-color: #28a745;
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s ease;
-    }
+        .error-message {
+            color: #d9534f;
+            margin-top: 15px;
+        }
 
-    .back-button:hover {
-      background-color: #218838;
-    }
+        .back-button {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #f78b00;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-    /* Error styling */
-    .error-message {
-      color: #d9534f;
-      font-size: 18px;
-      margin-top: 10px;
-    }
-
-    .error-detail {
-      color: #555;
-      font-size: 14px;
-      margin-top: 10px;
-      white-space: pre-wrap;
-    }
-  </style>
+            .back-button:hover {
+                background-color: #d96b00;
+            }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>🌦️ Weather Forecast</h1>
+        <p id="greeting">Loading your weather data...</p>
+        <button class="back-button" onclick="goBack()">← Back to Home</button>
+    </div>
 
-  <div class="container">
-    <h1>Windy App - Results</h1>
-    <p id="greeting">Loading data...</p>
-    <button class="back-button" onclick="goBack()">← Go back to Home</button>
-  </div>
+    <script>
+        const storedName = localStorage.getItem('username');
+        const storedLocation = localStorage.getItem('location');
+        const greetingElement = document.getElementById('greeting');
 
-  <script>
-    // Retrieve user data from localStorage
-    const storedName = localStorage.getItem('username');
-    const storedLocation = localStorage.getItem('location');
+        const lambdaUrl = "https://j69ymxtksk.execute-api.eu-north-1.amazonaws.com/weather";
 
-    // Reference to the paragraph element to display results
-    const greetingElement = document.getElementById('greeting');
+        function goBack() {
+            window.location.href = 'page1.html';
+        }
 
-    // Lambda endpoint URL (replace with your real API Gateway URL)
-    const lambdaUrl = "https://j69ymxtksk.execute-api.eu-north-1.amazonaws.com/weather";
-
-    // Function to return to page1.html
-    function goBack() {
-      window.location.href = "page1.html";
-    }
-
-    // If both name and location are available, call the weather API
-    if (storedName && storedLocation) {
-      fetch(`${lambdaUrl}?location=${storedLocation}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`API call failed: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          // If the city is not found or there's an API error
-          if (data.error || data.message === "city not found") {
-            greetingElement.innerHTML = `
-              <div class="error-message">
-                Sorry, <span class="highlight">${storedName}</span>!<br><br>
-                The location <span class="highlight">${storedLocation}</span> could not be found.<br><br>
-                Please try another city.
-              </div>
-            `;
-          } else {
-            // If data is valid, show the result
-            greetingElement.innerHTML = `
-              Welcome, <span class="highlight">${storedName}</span>!<br><br>
-              The weather in <span class="highlight">${storedLocation}</span> is
-              <span class="highlight">${data.temperature}°C</span>.
-            `;
-          }
-        })
-        .catch(error => {
-          // Display network or other fetch-related errors
-          greetingElement.innerHTML = `
-            <div class="error-message">Oops! Something went wrong:</div>
-            <div class="error-detail">${error.message}</div>
-          `;
-        });
-    } else {
-      // If localStorage has no data, show fallback
-      greetingElement.textContent = 'No user data found. Please go back and enter your details.';
-    }
-  </script>
-
+        if (storedName && storedLocation) {
+            fetch(`${lambdaUrl}?location=${storedLocation}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`API error: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error || data.message === "city not found") {
+                        greetingElement.innerHTML = `
+                  <div class="error-message">
+                    Sorry, <span class="highlight">${storedName}</span>!<br><br>
+                    We couldn’t find the weather for <span class="highlight">${storedLocation}</span>.<br><br>
+                    Try another location.
+                  </div>
+                `;
+                    } else {
+                        greetingElement.innerHTML = `
+                  Welcome, <span class="highlight">${storedName}</span>!<br><br>
+                  The weather in <span class="highlight">${storedLocation}</span> is <span class="highlight">${data.temperature}°C</span><br>
+                  <em>${data.condition || ''}</em>
+                `;
+                    }
+                })
+                .catch(error => {
+                    greetingElement.innerHTML = `
+                <div class="error-message">
+                  ⚠️ Oops! Something went wrong: ${error.message}
+                </div>
+              `;
+                });
+        } else {
+            greetingElement.textContent = 'Missing user data. Please go back and enter your info.';
+        }
+    </script>
 </body>
 </html>
