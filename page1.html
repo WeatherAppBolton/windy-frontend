@@ -1,122 +1,114 @@
-<!-- page1.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windy - Weather Checker</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f6d365, #fda085); /* soft sunset-style warm weather theme */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-  
-  <!-- Character encoding for the HTML document -->
-  <meta charset="UTF-8">
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
 
-  <!-- Title that appears in the browser tab -->
-  <title>Windy - Page 1</title>
+        h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
 
-  <!-- Embedded CSS for basic styling -->
-  <style>
+        p {
+            margin-bottom: 20px;
+            color: #555;
+        }
 
-    /* Style the entire page body */
-    body {
-      font-family: Arial, sans-serif;  
-      background-color: #f0f0f0;     
-      margin: 0;                     
-      padding: 20px;                
-    }
+        label {
+            display: block;
+            text-align: left;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #444;
+        }
 
-    /* A container class to keep content centered and styled nicely */
-    .container {
-      max-width: 500px;                 
-      margin: 50px auto;                
-      background-color: #fff;          
-      padding: 20px;                    
-      border-radius: 8px;               
-      box-shadow: 0 0 10px rgba(0,0,0,0.1); 
-    }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
 
-    /* Style for the main heading */
-    h1 {
-      text-align: center;   
-    }
+        button {
+            background-color: #f78b00; /* warm orange for action */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
 
-    /* Style for form labels */
-    label {
-      display: block;        
-      margin: 10px 0 5px;    
-    }
+            button:hover {
+                background-color: #d96b00;
+            }
 
-    /* Style for text input fields */
-    input {
-      width: 100%;           
-      padding: 8px;         
-      margin-bottom: 15px;   
-      border: 1px solid #ccc; 
-      border-radius: 4px;   
-    }
-
-    /* Style for the button */
-    button {
-      background-color: #2ddb2a; 
-      color: white;              
-      padding: 10px 15px;         
-      border: none;             
-      border-radius: 4px;        
-      cursor: pointer;           
-      font-size: 16px;            
-    }
-
-    /*Button color to change slightly on hover */
-    button:hover {
-      background-color: #45a049;
-    }
-
-  </style>
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>⛅ Welcome to Windy</h1>
+        <p>Please enter your name and the city you'd like to check the weather for.</p>
 
-  <!-- A div to hold everything in a nice white box -->
-  <div class="container">
-    <h1>Welcome to the Windy App</h1>
-    <p>Please enter your name and the location you'd like to check:</p>
+        <label for="username">Your Name</label>
+        <input type="text" id="username" placeholder="e.g. Mohit">
 
-    <!-- Label for the username input field -->
-    <label for="username">Name:</label>
-    <input type="text" id="username" placeholder="e.g. Mohit" required>
+        <label for="location">Location</label>
+        <input type="text" id="location" placeholder="e.g. London">
 
-    <!-- Label for the location input field -->
-    <label for="location">Location:</label>
-    <input type="text" id="location" placeholder="e.g. India" required>
+        <button id="submitBtn">Check Weather</button>
 
-    <!--  Button to save the data and go to Page 2 -->
-    <button id="submitBtn">Search</button>
+        <div class="footer">
+            © 2025 Windy Weather App
+        </div>
+    </div>
 
-  </div>
+    <script>
+        const submitButton = document.getElementById('submitBtn');
 
-  <!-- JavaScript to handle storing user input -->
-  <script>
+        submitButton.addEventListener('click', () => {
+            const userName = document.getElementById('username').value.trim();
+            const userLocation = document.getElementById('location').value.trim();
 
-    // Grabbing the button by its ID
-    const submitButton = document.getElementById('submitBtn');
+            if (!userName || !userLocation) {
+                alert('Please fill out both fields.');
+                return;
+            }
 
-    // Add a click event listener to the button
-    submitButton.addEventListener('click', () => {
-      // Get the value from the username field
-      const userName = document.getElementById('username').value;
-      // Get the value from the location field
-      const userLocation = document.getElementById('location').value;
-
-      // If either field is empty, alert the user and stop
-      if (!userName || !userLocation) {
-        alert('Please fill out both fields!');
-        return;
-      }
-
-      // Storing the values in localStorage so they can be accessed on page2
-      localStorage.setItem('username', userName);
-      localStorage.setItem('location', userLocation);
-
-      // Navigate to page2
-      window.location.href = 'page2.html';
-    });
-
-  </script>
-
+            localStorage.setItem('username', userName);
+            localStorage.setItem('location', userLocation);
+            window.location.href = 'page2.html';
+        });
+    </script>
 </body>
 </html>
