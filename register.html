@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌤️ Register - Windy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Register page-specific styles */
+    .cloud {
+      position: absolute;
+      background: url('https://svgshare.com/i/xoJ.svg') no-repeat center;
+      background-size: contain;
+      width: 220px;
+      height: 100px;
+      opacity: 0.08;
+      animation: drift 80s linear infinite;
+    }
+    .cloud:nth-child(1) { top: 10%; left: -25%; }
+    .cloud:nth-child(2) { top: 50%; left: -30%; animation-duration: 100s; }
+
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(200vw); }
+    }
+
+    .msg {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .msg.success {
+      color: #d4edda;
+      background: rgba(40, 167, 69, 0.2);
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .msg.error {
+      color: #ffdede;
+      background: rgba(255, 0, 0, 0.2);
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .back-link {
+      margin-top: 20px;
+      display: inline-block;
+      font-size: 14px;
+      text-decoration: none;
+      color: #eee;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body data-page="register">
+  <!-- Clouds -->
+  <div class="cloud"></div>
+  <div class="cloud"></div>
+
+  <div class="container">
+    <h1>☁️ Create Your Windy Account</h1>
+
+    <input type="text" id="regName" placeholder="Full Name ☀️" />
+    <input type="email" id="regEmail" placeholder="Email Address 📧" />
+    <input type="password" id="regPassword" placeholder="Password (min 6 chars) 🔐" />
+
+    <button onclick="registerUser()">✅ Register</button>
+    <p class="msg" id="msg"></p>
+
+    <a class="back-link" href="page1.html">← Back to Home</a>
+  </div>
+
+  <footer>© 2025 Windy Weather App • Made with 💙 </footer>
+
+  <script>
+    function registerUser() {
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const password = document.getElementById('regPassword').value;
+      const msg = document.getElementById('msg');
+
+      msg.textContent = '';
+      msg.className = 'msg';
+
+      if (!name || !email || !password) {
+        msg.textContent = '⚠️ Please fill out all fields.';
+        msg.classList.add('error');
+        return;
+      }
+
+      if (password.length < 6) {
+        msg.textContent = '⚠️ Password must be at least 6 characters.';
+        msg.classList.add('error');
+        return;
+      }
+
+      if (!email.includes('@') || !email.includes('.')) {
+        msg.textContent = '⚠️ Please enter a valid email.';
+        msg.classList.add('error');
+        return;
+      }
+
+      if (localStorage.getItem(`user_${email}`)) {
+        msg.textContent = '⚠️ Email already registered. Try logging in.';
+        msg.classList.add('error');
+        return;
+      }
+
+      const user = { name, email, password };
+      localStorage.setItem(`user_${email}`, JSON.stringify(user));
+
+      msg.textContent = '✅ Registered successfully! Redirecting...';
+      msg.classList.add('success');
+
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

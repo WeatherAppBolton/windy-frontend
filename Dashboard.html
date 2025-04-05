@@ -1,0 +1,54 @@
+<!-- Your request includes: persistent theme saving, removal of search history, responsive layout, and modular CSS/JS. -->
+<!-- This file (dashboard.html) now includes only the HTML layout and links to external CSS and JS files. -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>☁️ Windy - Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="dashboard">
+  <div class="cloud"></div>
+  <div class="cloud"></div>
+  <button class="logout-btn" onclick="logoutUser()">🚪 Logout</button>
+  <div class="container">
+    <h1>🌤️ Welcome, <span id="username">User</span></h1>
+
+    <div class="input-group">
+      <label for="city">Check Weather:</label>
+      <input type="text" id="city" placeholder="Enter a city...">
+      <button onclick="checkWeather()">🔍 Check</button>
+      <button id="saveFavBtn" onclick="saveToFavorites()">⭐ Save to Favorites</button>
+    </div>
+
+    <div id="weatherResult"></div>
+
+    <div class="saved-list">
+      <h3>❤️ Saved Locations (<span id="favCount">0/3</span>)</h3>
+      <button id="refreshAllBtn" onclick="renderSaved()">🔁 Refresh All</button>
+      <ul id="savedCities"></ul>
+    </div>
+
+    <div class="settings">
+      <h3>⚙️ Profile Settings</h3>
+      <input type="text" id="editName" placeholder="Update name...">
+      <input type="email" id="editEmail" placeholder="Update email...">
+      <button onclick="updateProfile()">📂 Save Profile</button>
+    </div>
+
+    <div class="theme-toggle">
+      <h3>🎨 Theme</h3>
+      <select id="themeSelect" onchange="changeTheme()">
+        <option value="default">🌈 Default</option>
+        <option value="sunset">🌇 Sunset</option>
+        <option value="night">🌙 Night</option>
+      </select>
+    </div>
+  </div>
+  <footer>© 2025 Windy Weather App • </footer>
+  <script src="script.js"></script>
+</body>
+</html>

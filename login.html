@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌤️ Login - Windy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Login page-specific styles */
+    .cloud {
+      position: absolute;
+      background: url('https://svgshare.com/i/xoJ.svg') no-repeat center;
+      background-size: contain;
+      width: 220px;
+      height: 100px;
+      opacity: 0.08;
+      animation: drift 70s linear infinite;
+    }
+    .cloud:nth-child(1) { top: 10%; left: -20%; }
+    .cloud:nth-child(2) { top: 60%; left: -30%; animation-duration: 100s; }
+
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(200vw); }
+    }
+
+    .msg {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .msg.success {
+      color: #d4edda;
+      background: rgba(40, 167, 69, 0.2);
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .msg.error {
+      color: #ffdede;
+      background: rgba(255, 0, 0, 0.2);
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .back-link {
+      margin-top: 20px;
+      display: inline-block;
+      font-size: 14px;
+      text-decoration: none;
+      color: #eee;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body data-page="login">
+
+  <!-- Clouds -->
+  <div class="cloud"></div>
+  <div class="cloud"></div>
+
+  <div class="container">
+    <h1>🔐 Login to Windy</h1>
+    <input type="email" id="loginEmail" placeholder="Email Address 📧" />
+    <input type="password" id="loginPassword" placeholder="Password 🔐" />
+    <button onclick="loginUser()">✅ Login</button>
+    <p class="msg" id="loginMsg"></p>
+    <a class="back-link" href="page1.html">← Back to Home</a>
+  </div>
+
+  <footer>© 2025 Windy Weather App • Made with ☁️ </footer>
+
+  <script>
+    function loginUser() {
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value;
+      const msg = document.getElementById('loginMsg');
+
+      msg.textContent = '';
+      msg.className = 'msg';
+
+      if (!email || !password) {
+        msg.textContent = '⚠️ Please fill out all fields.';
+        msg.className = 'msg error';
+        return;
+      }
+
+      const storedUser = localStorage.getItem(`user_${email}`);
+      if (!storedUser) {
+        msg.textContent = '❌ No user found with this email.';
+        msg.className = 'msg error';
+        return;
+      }
+
+      const user = JSON.parse(storedUser);
+      if (user.password !== password) {
+        msg.textContent = '❌ Incorrect password.';
+        msg.className = 'msg error';
+        return;
+      }
+
+      localStorage.setItem('username', user.name);
+      localStorage.setItem('location', '');
+      localStorage.setItem('loggedInUser', user.email);
+
+      msg.textContent = '✅ Login successful! Redirecting...';
+      msg.className = 'msg success';
+
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
