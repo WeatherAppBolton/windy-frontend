@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* Page-specific styles: floating clouds + animated result fade */
     .cloud {
       position: absolute;
       background: url('https://svgshare.com/i/xoJ.svg') no-repeat center;
@@ -49,18 +48,13 @@
     }
   </style>
 </head>
-<body>
-
-    <div class="container">
-        <h1>🌦️ Weather Forecast</h1>
-        <p id="greeting">Loading your weather data...</p>
-        <button class="back-button" onclick="goBack()">← Back to Home</button>
 <body data-page="weather">
 
   <!-- Animated Clouds -->
   <div class="cloud"></div>
   <div class="cloud"></div>
 
+  <!-- Single container (weather display) -->
   <div class="container">
     <h1>🌦️ Weather Forecast</h1>
     <div id="greeting">Checking user data...</div>
@@ -68,7 +62,6 @@
     <div id="locationPrompt" style="display: none;">
       <input type="text" id="locationInput" placeholder="Enter your city..." />
       <button id="submitLocation">🔍 Check Weather</button>
->>>>>>> chore/frontend-style-update
     </div>
 
     <button class="back-button" onclick="window.location.href='page1.html'">← Back to Home</button>
