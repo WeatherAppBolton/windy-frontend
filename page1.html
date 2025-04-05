@@ -1,114 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windy - Weather Checker</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f6d365, #fda085); /* soft sunset-style warm weather theme */
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌤️ Windy - Welcome</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Page-specific styles for welcome animation only */
+    .cloud {
+      position: absolute;
+      background: url('https://svgshare.com/i/xoJ.svg') no-repeat center;
+      background-size: contain;
+      width: 240px;
+      height: 120px;
+      opacity: 0.08;
+      animation: drift 60s linear infinite;
+    }
+    .cloud:nth-child(1) { top: 8%; left: -20%; animation-duration: 80s; }
+    .cloud:nth-child(2) { top: 50%; left: -30%; animation-duration: 100s; }
 
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(200vw); }
+    }
 
-        h1 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        p {
-            margin-bottom: 20px;
-            color: #555;
-        }
-
-        label {
-            display: block;
-            text-align: left;
-            margin: 10px 0 5px;
-            font-weight: bold;
-            color: #444;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #f78b00; /* warm orange for action */
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-            button:hover {
-                background-color: #d96b00;
-            }
-
-        .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #999;
-        }
-    </style>
+    .form-group {
+      margin-top: 20px;
+      display: none;
+      animation: fadeIn 0.6s ease forwards;
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <h1>⛅ Welcome to Windy</h1>
-        <p>Please enter your name and the city you'd like to check the weather for.</p>
+<body data-page="welcome">
+  <div class="cloud"></div>
+  <div class="cloud"></div>
 
-        <label for="username">Your Name</label>
-        <input type="text" id="username" placeholder="e.g. Mohit">
+  <div class="container">
+    <h1>⛅ Welcome to <strong>Windy</strong></h1>
 
-        <label for="location">Location</label>
-        <input type="text" id="location" placeholder="e.g. London">
+    <button class="btn" onclick="window.location.href='register.html'">📝 Register</button>
+    <button class="btn" onclick="window.location.href='login.html'">🔐 Login</button>
+    <button class="btn" onclick="showGuestForm()">👤 Continue as Guest</button>
 
-        <button id="submitBtn">Check Weather</button>
-
-        <div class="footer">
-            © 2025 Windy Weather App
-        </div>
+    <div class="form-group" id="guestForm">
+      <input type="text" id="username" placeholder="Your Name 🌱">
+      <input type="text" id="location" placeholder="Your City 📍">
+      <button class="btn" onclick="continueAsGuest()">☁️ Check Weather</button>
     </div>
+  </div>
 
-    <script>
-        const submitButton = document.getElementById('submitBtn');
+  <footer>© 2025 Windy Weather App • Built with ☀️ & ☁️ </footer>
 
-        submitButton.addEventListener('click', () => {
-            const userName = document.getElementById('username').value.trim();
-            const userLocation = document.getElementById('location').value.trim();
-
-            if (!userName || !userLocation) {
-                alert('Please fill out both fields.');
-                return;
-            }
-
-            localStorage.setItem('username', userName);
-            localStorage.setItem('location', userLocation);
-            window.location.href = 'page2.html';
-        });
-    </script>
+  <script src="script.js"></script>
+  <script>
+    function showGuestForm() {
+      document.getElementById('guestForm').style.display = 'block';
+    }
+  </script>
 </body>
 </html>

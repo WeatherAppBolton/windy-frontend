@@ -1,124 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windy - Weather Results</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f6d365, #fda085); /* consistent with page1 */
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌤️ Windy - Weather Results</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Page-specific styles: floating clouds + animated result fade */
+    .cloud {
+      position: absolute;
+      background: url('https://svgshare.com/i/xoJ.svg') no-repeat center;
+      background-size: contain;
+      width: 220px;
+      height: 100px;
+      opacity: 0.08;
+      animation: drift 70s linear infinite;
+    }
+    .cloud:nth-child(1) { top: 8%; left: -25%; }
+    .cloud:nth-child(2) { top: 60%; left: -30%; animation-duration: 90s; }
 
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-        }
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(220vw); }
+    }
 
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
+    .weather-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      animation: popIn 0.6s ease-out;
+    }
 
-        #greeting {
-            font-size: 18px;
-            margin-top: 20px;
-            color: #444;
-        }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
 
-        .highlight {
-            color: #f78b00;
-            font-weight: bold;
-        }
+    #locationPrompt {
+      animation: fadeIn 0.6s ease forwards;
+    }
 
-        .error-message {
-            color: #d9534f;
-            margin-top: 15px;
-        }
-
-        .back-button {
-            margin-top: 30px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #f78b00;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-            .back-button:hover {
-                background-color: #d96b00;
-            }
-    </style>
+    .error-message {
+      color: #ffdede;
+      background: rgba(255, 0, 0, 0.2);
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
-    <p>
-        MOHIT
-            </p>
 
     <div class="container">
         <h1>🌦️ Weather Forecast</h1>
         <p id="greeting">Loading your weather data...</p>
         <button class="back-button" onclick="goBack()">← Back to Home</button>
+<body data-page="weather">
+
+  <!-- Animated Clouds -->
+  <div class="cloud"></div>
+  <div class="cloud"></div>
+
+  <div class="container">
+    <h1>🌦️ Weather Forecast</h1>
+    <div id="greeting">Checking user data...</div>
+
+    <div id="locationPrompt" style="display: none;">
+      <input type="text" id="locationInput" placeholder="Enter your city..." />
+      <button id="submitLocation">🔍 Check Weather</button>
+>>>>>>> chore/frontend-style-update
     </div>
 
-    <script>
-        const storedName = localStorage.getItem('username');
-        const storedLocation = localStorage.getItem('location');
-        const greetingElement = document.getElementById('greeting');
+    <button class="back-button" onclick="window.location.href='page1.html'">← Back to Home</button>
+  </div>
 
-        const lambdaUrl = "https://j69ymxtksk.execute-api.eu-north-1.amazonaws.com/weather";
+  <footer>© 2025 Windy Weather App • Powered by ☀️ and APIs</footer>
 
-        function goBack() {
-            window.location.href = 'page1.html';
+  <script src="script.js"></script>
+  <script>
+    window.onload = () => {
+      const lambdaUrl = "https://j69ymxtksk.execute-api.eu-north-1.amazonaws.com/weather";
+      const username = localStorage.getItem("username");
+      let userlocation = localStorage.getItem("location");
+      const greeting = document.getElementById("greeting");
+      const locationPrompt = document.getElementById("locationPrompt");
+
+      function applyTemperatureTheme(temp) {
+        const body = document.body;
+        if (temp < 10) {
+          body.style.background = "linear-gradient(135deg, #83a4d4, #b6fbff)";
+        } else if (temp >= 10 && temp <= 20) {
+          body.style.background = "linear-gradient(135deg, #43cea2, #185a9d)";
+        } else if (temp > 20 && temp <= 30) {
+          body.style.background = "linear-gradient(135deg, #f6d365, #fda085)";
+        } else {
+          body.style.background = "linear-gradient(135deg, #f83600, #f9d423)";
         }
+      }
 
-        if (storedName && storedLocation) {
-            fetch(`${lambdaUrl}?location=${storedLocation}`)
-                .then(response => {
-                    if (!response.ok) throw new Error(`API error: ${response.status}`);
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.error || data.message === "city not found") {
-                        greetingElement.innerHTML = `
-                  <div class="error-message">
-                    Sorry, <span class="highlight">${storedName}</span>!<br><br>
-                    We couldn’t find the weather for <span class="highlight">${storedLocation}</span>.<br><br>
-                    Try another location.
-                  </div>
-                `;
-                    } else {
-                        greetingElement.innerHTML = `
-                  Welcome, <span class="highlight">${storedName}</span>!<br><br>
-                  The weather in <span class="highlight">${storedLocation}</span> is <span class="highlight">${data.temperature}°C</span><br>
-                  <em>${data.condition || ''}</em>
-                `;
-                    }
-                })
-                .catch(error => {
-                    greetingElement.innerHTML = `
+      function getWeatherIcon(condition = "") {
+        condition = condition.toLowerCase();
+        if (condition.includes("cloud")) return "☁️";
+        if (condition.includes("rain")) return "🌧️";
+        if (condition.includes("sun") || condition.includes("clear")) return "☀️";
+        if (condition.includes("snow")) return "❄️";
+        if (condition.includes("storm") || condition.includes("thunder")) return "⛈️";
+        return "🌈";
+      }
+
+      function fetchWeather(city) {
+        fetch(`${lambdaUrl}?location=${city}`)
+          .then(res => {
+            if (!res.ok) throw new Error(`API error: ${res.status}`);
+            return res.json();
+          })
+          .then(data => {
+            if (data.error || data.message === "city not found") {
+              greeting.innerHTML = `
                 <div class="error-message">
-                  ⚠️ Oops! Something went wrong: ${error.message}
+                  ❗ Sorry, <span class="highlight">${username}</span>!<br><br>
+                  We couldn’t find the weather for <span class="highlight">${city}</span>.
                 </div>
               `;
-                });
-        } else {
-            greetingElement.textContent = 'Missing user data. Please go back and enter your info.';
-        }
-    </script>
+            } else {
+              const icon = getWeatherIcon(data.condition);
+              greeting.innerHTML = `
+                <div class="weather-icon">${icon}</div>
+                Hello, <span class="highlight">${username}</span>!<br><br>
+                The weather in <span class="highlight">${city}</span> is <span class="highlight">${data.temperature}°C</span><br>
+                <em>${data.condition || ''}</em>
+              `;
+              applyTemperatureTheme(data.temperature);
+            }
+          })
+          .catch(error => {
+            greeting.innerHTML = `
+              <div class="error-message">
+                ⚠️ Error: ${error.message}
+              </div>
+            `;
+          });
+      }
+
+      if (!username) {
+        greeting.innerHTML = '⚠️ User not found. Please go back and login.';
+        return;
+      }
+
+      if (!userlocation || userlocation === '') {
+        greeting.innerHTML = `Hi <span class="highlight">${username}</span>, please enter your location:`;
+        locationPrompt.style.display = 'block';
+
+        document.getElementById('submitLocation').onclick = () => {
+          const newLoc = document.getElementById('locationInput').value.trim();
+          if (!newLoc) {
+            alert("Please enter a city.");
+            return;
+          }
+          localStorage.setItem("location", newLoc);
+          locationPrompt.style.display = 'none';
+          fetchWeather(newLoc);
+        };
+      } else {
+        fetchWeather(userlocation);
+      }
+    };
+  </script>
 </body>
 </html>
