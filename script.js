@@ -1,9 +1,7 @@
 // Updated script.js with bug fixes, improved UX, per-user storage and better drag handling
 
 const lambdaUrl = "https://j69ymxtksk.execute-api.eu-north-1.amazonaws.com/weather";
-const username = localStorage.getItem("username") || "User";
 const userEmail = localStorage.getItem("loggedInUser");
-document.getElementById("username").innerText = username;
 
 const cityInput = document.getElementById("city");
 const savedCitiesEl = document.getElementById("savedCities");
@@ -11,6 +9,16 @@ const weatherResult = document.getElementById("weatherResult");
 const saveFavBtn = document.getElementById("saveFavBtn");
 const favCountEl = document.getElementById("favCount");
 let lastSearchedCity = "";
+
+function setupDashboard() {
+  const username = localStorage.getItem("username") || "User";
+  const usernameEl = document.getElementById("username");
+  if (usernameEl) {
+    usernameEl.innerText = username;
+  }
+}
+
+window.onload = setupDashboard;
 
 function getUserKey() {
   return `savedCities_${userEmail}`;

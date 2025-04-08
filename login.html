@@ -4,21 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🌤️ Login - Windy</title>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* Login page-specific styles */
-    .cloud {
-      position: absolute;
-      background: url('https://svgshare.com/i/xoJ.svg') no-repeat center;
-      background-size: contain;
-      width: 220px;
-      height: 100px;
-      opacity: 0.08;
-      animation: drift 70s linear infinite;
-    }
-    .cloud:nth-child(1) { top: 10%; left: -20%; }
-    .cloud:nth-child(2) { top: 60%; left: -30%; animation-duration: 100s; }
 
     @keyframes drift {
       from { transform: translateX(0); }
@@ -59,15 +46,11 @@
 </head>
 <body data-page="login">
 
-  <!-- Clouds -->
-  <div class="cloud"></div>
-  <div class="cloud"></div>
-
   <div class="container">
     <h1>🔐 Login to Windy</h1>
     <input type="email" id="loginEmail" placeholder="Email Address 📧" />
     <input type="password" id="loginPassword" placeholder="Password 🔐" />
-    <button onclick="loginUser()">✅ Login</button>
+    <button type="button" onclick="loginUser()">✅ Login</button>
     <p class="msg" id="loginMsg"></p>
     <a class="back-link" href="page1.html">← Back to Home</a>
   </div>
@@ -75,45 +58,73 @@
   <footer>© 2025 Windy Weather App • Made with ☁️ </footer>
 
   <script>
-    function loginUser() {
-      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-      const password = document.getElementById('loginPassword').value;
-      const msg = document.getElementById('loginMsg');
+function loginUser() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+  const msg = document.getElementById('loginMsg');
 
-      msg.textContent = '';
-      msg.className = 'msg';
+  msg.textContent = '';
+  msg.className = 'msg';
 
-      if (!email || !password) {
-        msg.textContent = '⚠️ Please fill out all fields.';
-        msg.className = 'msg error';
-        return;
-      }
+  const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  if (!email || !emailPattern.test(email)) {
+    msg.textContent = '⚠️ Enter a valid email.';
+    msg.classList.add('error');
+    return;
+  }
 
-      const storedUser = localStorage.getItem(`user_${email}`);
-      if (!storedUser) {
-        msg.textContent = '❌ No user found with this email.';
-        msg.className = 'msg error';
-        return;
-      }
+  if (!password) {
+    msg.textContent = '⚠️ Password cannot be empty.';
+    msg.classList.add('error');
+    return;
+  }
 
-      const user = JSON.parse(storedUser);
-      if (user.password !== password) {
-        msg.textContent = '❌ Incorrect password.';
-        msg.className = 'msg error';
-        return;
-      }
+  fetch("https://xwy5prdzt9.execute-api.eu-north-1.amazonaws.com/default/LoginUser", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  })
+  .then(async res => {
+    const raw = await res.text();
+    let data = {};
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      msg.textContent = '⚠️ Invalid response from server.';
+      msg.classList.add('error');
+      return;
+    }
 
-      localStorage.setItem('username', user.name);
-      localStorage.setItem('location', '');
-      localStorage.setItem('loggedInUser', user.email);
-
+    if (res.ok && data.message === "Login successful") {
       msg.textContent = '✅ Login successful! Redirecting...';
-      msg.className = 'msg success';
+      msg.classList.add('success');
+
+      localStorage.setItem("loggedInEmail", email); // existing
+      localStorage.removeItem("favorites");         // clear old session data
+      localStorage.removeItem("displayName");       // optional: reset username
+      localStorage.removeItem("activeTheme");       // optional: force DB theme
 
       setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href = "Dashboard.html";
       }, 1500);
+    } else {
+      msg.textContent = '⚠️ ' + (data.error || 'Incorrect credentials.');
+      msg.classList.add('error');
     }
+  })
+  .catch(() => {
+    msg.textContent = '⚠️ Error connecting to server.';
+    msg.classList.add('error');
+  });
+}
   </script>
+
+  <script>
+  // Clear login state on page load
+  window.onload = function() {
+    localStorage.removeItem("loggedInEmail");
+  };
+  </script>
+  
 </body>
 </html>
