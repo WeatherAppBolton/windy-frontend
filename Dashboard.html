@@ -1,6 +1,3 @@
-<!-- Your request includes: persistent theme saving, removal of search history, responsive layout, and modular CSS/JS. -->
-<!-- This file (dashboard.html) now includes only the HTML layout and links to external CSS and JS files. -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,47 +5,410 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>☁️ Windy - Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --color-bg: linear-gradient(to bottom right, #15c747, #1b1494);
+      --color-card: rgba(255, 255, 255, 0.1);
+      --color-border: rgba(255, 255, 255, 0.2);
+      --color-text: #fff;
+      --color-btn: #ffa726;
+      --color-input: #ffffff;
+      --color-logout: #ef5350;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--color-bg);
+      color: var(--color-text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .logout-container {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      padding: 1rem;
+    }
+
+    .logout-btn {
+      background: var(--color-logout);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .dashboard-card {
+      background: var(--color-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .dashboard-title {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+    }
+
+    .dashboard-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: none;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: var(--color-btn);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #fb8c00;
+    }
+
+    .fav-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .fav-list li {
+      background: rgba(255, 255, 255, 0.2);
+      margin: 5px 0;
+      padding: 0.5rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #ffffffcc;
+    }
+
+    body.sunset {
+      --color-bg: linear-gradient(to bottom right, #fd746c, #ff9068);
+    }
+
+    body.night {
+      --color-bg: linear-gradient(to bottom right, #141e30, #243b55);
+    }
+  </style>
 </head>
 <body data-page="dashboard">
-  <div class="cloud"></div>
-  <div class="cloud"></div>
-  <button class="logout-btn" onclick="logoutUser()">🚪 Logout</button>
-  <div class="container">
-    <h1>🌤️ Welcome, <span id="username">User</span></h1>
+  <div class="logout-container">
+    <button class="logout-btn" onclick="logoutUser()">🚪 Logout</button>
+  </div>
 
-    <div class="input-group">
+  <main class="dashboard-card">
+    <h1 class="dashboard-title">🌤️ Welcome, <span id="username">User</span></h1>
+
+    <section class="dashboard-section">
       <label for="city">Check Weather:</label>
-      <input type="text" id="city" placeholder="Enter a city...">
-      <button onclick="checkWeather()">🔍 Check</button>
-      <button id="saveFavBtn" onclick="saveToFavorites()">⭐ Save to Favorites</button>
-    </div>
+      <div class="input-row">
+        <input type="text" id="city" placeholder="Enter a city...">
+        <button onclick="checkWeather()">🔍 Check</button>
+        <button id="saveFavBtn" onclick="saveToFavorites()">⭐ Save</button>
+      </div>
+    </section>
 
     <div id="weatherResult"></div>
 
-    <div class="saved-list">
-      <h3>❤️ Saved Locations (<span id="favCount">0/3</span>)</h3>
-      <button id="refreshAllBtn" onclick="renderSaved()">🔁 Refresh All</button>
-      <ul id="savedCities"></ul>
-    </div>
+    <section class="dashboard-section">
+      <h3>❤️ Favorites (<span id="favCount">0/3</span>)</h3>
+      <button id="refreshAllBtn" onclick="renderSaved()">🔁 Refresh</button>
+      <ul id="savedCities" class="fav-list"></ul>
+    </section>
 
-    <div class="settings">
+    <section class="dashboard-section">
       <h3>⚙️ Profile Settings</h3>
-      <input type="text" id="editName" placeholder="Update name...">
-      <input type="email" id="editEmail" placeholder="Update email...">
-      <button onclick="updateProfile()">📂 Save Profile</button>
-    </div>
+      <label for="updateOption">Select what to update:</label>
+      <select id="updateOption" onchange="renderProfileUpdateForm()">
+        <option value="">-- Choose an option --</option>
+        <option value="name">Update Name</option>
+        <option value="email">Update Email</option>
+        <option value="password">Update Password</option>
+      </select>
+      <div id="profileUpdateFields"></div>
+      <button onclick="submitProfileUpdate()">📂 Update</button>
+    </section>
 
-    <div class="theme-toggle">
+    <section class="dashboard-section">
       <h3>🎨 Theme</h3>
       <select id="themeSelect" onchange="changeTheme()">
         <option value="default">🌈 Default</option>
         <option value="sunset">🌇 Sunset</option>
         <option value="night">🌙 Night</option>
       </select>
-    </div>
-  </div>
-  <footer>© 2025 Windy Weather App • </footer>
-  <script src="script.js"></script>
+    </section>
+  </main>
+
+  <footer>© 2025 Windy Weather App</footer>
+
+  <script>
+    const GET_PREFS_URL = "https://6yj2hgnxxa.execute-api.eu-north-1.amazonaws.com/getUserPref";
+    const UPDATE_PREFS_URL = "https://sxgd50ejng.execute-api.eu-north-1.amazonaws.com/updatePrefs";
+
+    let userEmail = localStorage.getItem("loggedInEmail") || "";
+
+    window.onload = () => {
+      if (!userEmail) {
+        alert("User not logged in.");
+        window.location.href = "login.html";
+      } else {
+        loadDashboard(); // Load everything from DB
+      }
+    };
+
+    function loadDashboard() {
+      fetch(`${GET_PREFS_URL}?email=${encodeURIComponent(userEmail)}`)
+        .then(res => res.json())
+        .then(apiResponse => {
+         const data = typeof apiResponse.body === "string"
+            ? JSON.parse(apiResponse.body)
+            : apiResponse.body;
+
+          console.log("Parsed user data:", data); // for debugging
+
+          // 1️⃣ Theme
+          const theme = data.theme || "default";
+         document.body.className = theme;
+         document.getElementById("themeSelect").value = theme;
+
+         // 2️⃣ Favorites
+          const favorites = Array.isArray(data.favorites) ? data.favorites : [];
+          renderSavedFavorites(favorites);
+
+         // 3️⃣ Display name
+         const displayName = data.name || userEmail.split("@")[0];
+         document.getElementById("username").textContent = displayName;
+       })
+       .catch(err => {
+         console.error("Error loading dashboard:", err);
+         document.body.className = "default";
+         document.getElementById("themeSelect").value = "default";
+         renderSavedFavorites([]);
+       });
+    }
+
+    function changeTheme() {
+      const selectedTheme = document.getElementById("themeSelect").value;
+      document.body.className = selectedTheme;
+      updatePrefs({ theme: selectedTheme }); // update DynamoDB only
+    }
+
+
+    function checkWeather() {
+      const city = document.getElementById("city").value.trim();
+      if (!city) return;
+      const apiKey = "3e1551bf87cae22bfd3014698a68ece2";
+      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+          if (data.cod === 200) {
+            document.getElementById("weatherResult").innerHTML =
+              `<p><strong>${data.name}, ${data.sys.country}</strong></p>
+               <p>Temperature: ${data.main.temp}°C</p>
+               <p>Condition: ${data.weather[0].description}</p>`;
+          } else {
+            document.getElementById("weatherResult").textContent = "City not found.";
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching weather:", err);
+          document.getElementById("weatherResult").textContent = "Failed to retrieve weather data.";
+        });
+      }
+
+    function saveToFavorites() {
+      const city = document.getElementById("city").value.trim();
+      if (!city) return;
+
+      fetch(`${GET_PREFS_URL}?email=${encodeURIComponent(userEmail)}`)
+        .then(res => res.json())
+        .then(data => {
+          let favs = Array.isArray(data.favorites) ? data.favorites : [];
+
+         if (favs.find(f => f.includes(city))) return alert("Already added.");
+         if (favs.length >= 3) return alert("Only 3 favorites allowed.");
+
+         const apiKey = "3e1551bf87cae22bfd3014698a68ece2";
+         const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+          fetch(apiUrl)
+            .then(res => res.json())
+            .then(weather => {
+              if (weather.cod === 200) {
+                const fullCity = `${weather.name}, ${weather.sys.country} - ${weather.main.temp}°C`;
+                favs.push(fullCity);
+                renderSavedFavorites(favs);
+                updatePrefs({ favorites: favs }); // save updated list to DB
+              } else {
+                alert("City not found.");
+              }
+           });
+       })
+       .catch(err => {
+         console.error("Failed to update favorites:", err);
+         alert("Error fetching user favorites.");
+       });
+    }
+
+    function renderSavedFavorites(favorites) {
+      const favList = document.getElementById("savedCities");
+      favList.innerHTML = "";
+      document.getElementById("favCount").textContent = `${favorites.length}/3`;
+
+      favorites.forEach(city => {
+        const cleanCity = city.includes("°C") ? city.split(" - ")[0] : city;
+       const apiKey = "3e1551bf87cae22bfd3014698a68ece2";
+       const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cleanCity}&appid=${apiKey}&units=metric`;
+
+        fetch(apiUrl)
+         .then(res => res.json())
+         .then(data => {
+            const fullCity = `${data.name}, ${data.sys.country} - ${data.main.temp}°C`;
+            addCityToList(fullCity);
+         })
+         .catch(() => {
+            addCityToList(city); // fallback to what we got
+          });
+      });
+
+      function addCityToList(city) {
+        const li = document.createElement("li");
+        li.textContent = city;
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "❌";
+        removeBtn.onclick = () => {
+          const updated = favorites.filter(c => c !== city);
+          renderSavedFavorites(updated);
+          updatePrefs({ favorites: updated });
+        };
+       li.appendChild(removeBtn);
+       favList.appendChild(li);
+      }
+    }
+
+
+    function renderSaved() {
+      fetch(`${GET_PREFS_URL}?email=${encodeURIComponent(userEmail)}`)
+        .then(res => res.json())
+        .then(data => {
+          const favs = Array.isArray(data.favorites) ? data.favorites : [];
+          renderSavedFavorites(favs);
+        })
+        .catch(err => {
+          console.error("Error refreshing favorites:", err);
+          renderSavedFavorites([]);
+        });
+    }
+
+
+    function updatePrefs(prefs) {
+      fetch(UPDATE_PREFS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail, ...prefs }),
+      })
+        .then((res) => res.json())
+        .then((data) => console.log("Preferences updated:", data))
+        .catch((err) => console.error("Error updating preferences:", err));
+    }
+
+    function logoutUser() {
+      localStorage.removeItem("loggedInEmail");
+      window.location.href = "login.html";
+    }
+
+    function renderProfileUpdateForm() {
+      const option = document.getElementById("updateOption").value;
+      const container = document.getElementById("profileUpdateFields");
+      container.innerHTML = "";
+
+      if (option === "name") {
+        container.innerHTML = `
+          <input type="email" id="currentEmail" placeholder="Current email" required>
+          <input type="text" id="newName" placeholder="New name" required>`;
+      } else if (option === "email") {
+        container.innerHTML = `
+          <input type="email" id="currentEmail" placeholder="Current email" required>
+          <input type="email" id="newEmail" placeholder="New email" required>`;
+      } else if (option === "password") {
+        container.innerHTML = `
+          <input type="email" id="currentEmail" placeholder="Current email" required>
+          <input type="password" id="newPassword" placeholder="New password" required>`;
+      }
+    }
+
+    function submitProfileUpdate() {
+      const option = document.getElementById("updateOption").value;
+      const currentEmail = document.getElementById("currentEmail")?.value.trim();
+      const name = document.getElementById("newName")?.value.trim();
+      const newEmail = document.getElementById("newEmail")?.value.trim();
+      const password = document.getElementById("newPassword")?.value.trim();
+
+      if (!currentEmail) return alert("Please enter your current email.");
+
+      const payload = { email: currentEmail };
+      if (option === "name" && name) payload.name = name;
+      else if (option === "email" && newEmail) {
+        payload.previousEmail = currentEmail;
+        payload.email = newEmail;
+      }
+      else if (option === "password" && password) payload.password = password;
+      else return alert("Please fill in the required fields.");
+
+      fetch(UPDATE_PREFS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert("Update successful!");
+          console.log("Profile update:", data);
+        })
+        .catch(err => {
+          console.error("Update failed:", err);
+          alert("Failed to update profile.");
+        });
+    }
+  </script>
 </body>
 </html>
