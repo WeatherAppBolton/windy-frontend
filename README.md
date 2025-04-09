@@ -61,10 +61,10 @@ cd weather-app-frontend
 
 ## 🙌 Contributors
 
-- Antonio (Team Lead)
-- Mohit, Bilal (Frontend)
+- Antonio (Team Lead and AWS admin)
+- Bilal (DB and Lambda dev)
+- Mohit, Raj (Frontend)
 - Prateek (CI/CD, DB)
-- Raj (Documentation & GitOps)
 
 ---
 
