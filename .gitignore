@@ -1,3 +1,5 @@
+# windy-frontend/.gitignore
+
 # Python
 __pycache__/
 *.py[cod]
@@ -34,6 +36,7 @@ Thumbs.db
 *.swp
 *.swo
 *.bak
+.DS_Store
 
 # Git credentials or config (if any)
 .git-credentials
@@ -44,3 +47,10 @@ Thumbs.db
 # Files generated during testing or build
 build/
 dist/
+
+# Dependency directories
+node_modules/
+
+# Build output
+dist/
+build/

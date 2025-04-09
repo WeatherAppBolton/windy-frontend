@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🌤️ Login - Windy</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
   <style>
 
     @keyframes drift {
@@ -52,7 +52,7 @@
     <input type="password" id="loginPassword" placeholder="Password 🔐" />
     <button type="button" onclick="loginUser()">✅ Login</button>
     <p class="msg" id="loginMsg"></p>
-    <a class="back-link" href="page1.html">← Back to Home</a>
+    <a class="back-link" href="index.html">← Back to Home</a>
   </div>
 
   <footer>© 2025 Windy Weather App • Made with ☁️ </footer>
@@ -105,7 +105,7 @@ function loginUser() {
       localStorage.removeItem("activeTheme");       // optional: force DB theme
 
       setTimeout(() => {
-        window.location.href = "Dashboard.html";
+        window.location.href = "dashboard_user.html";
       }, 1500);
     } else {
       msg.textContent = '⚠️ ' + (data.error || 'Incorrect credentials.');

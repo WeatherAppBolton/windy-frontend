@@ -216,7 +216,7 @@ function continueAsGuest() {
   localStorage.setItem("location", userLocation);
   localStorage.setItem("loggedInUser", `guest_${Date.now()}`);
 
-  window.location.href = "page2.html";
+  window.location.href = "dashboard_guest.html";
 }
 
 renderSaved();
