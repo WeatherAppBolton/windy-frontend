@@ -79,7 +79,7 @@ function loginUser() {
     return;
   }
 
-  fetch("https://xwy5prdzt9.execute-api.eu-north-1.amazonaws.com/default/LoginUser", {
+  fetch("https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password })
