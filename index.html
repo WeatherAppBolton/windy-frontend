@@ -32,31 +32,43 @@
     }
   </style>
 </head>
-<body data-page="welcome">
-  <div class="cloud"></div>
-  <div class="cloud"></div>
+<body>
+    <header> 
+        <h2 class="logo">Windy🌦️</h2>
+        <div class="nav-wrapper">
+            <nav class="navigation">
+                <a href="#" class="active">Home</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Register</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
 
-  <div class="container">
-    <h1>⛅ Welcome to <strong>Windy</strong></h1>
+    <section class="parallax">
+        <img src="assets/images/hill1.png" alt="hill1" id="hill1">
+        <img src="assets/images/hill2.png" alt="hill2" id="hill2">
+        <img src="assets/images/hill3.png" alt="hill3" id="hill3">
+        <img src="assets/images/hill4.png" alt="hill4" id="hill4">
+        <img src="assets/images/hill5.png" alt="hill5" id="hill5">
+        <img src="assets/images/tree.png" alt="tree" id="tree">
+        <h2 id="text">Welcome to Windy🌦️</h2>
+        <p id="text1">Discover the weather like never before!</p>
+        <img src="assets/images/leaf.png" alt="leaf" id="leaf">
+        <img src="assets/images/plant.png" alt="plant" id="plant">
+    </section>
 
-    <button class="btn" onclick="window.location.href='register.html'">📝 Register</button>
-    <button class="btn" onclick="window.location.href='login.html'">🔐 Login</button>
-    <button class="btn" onclick="showGuestForm()">👤 Continue as Guest</button>
+    <section class="sec">
+        <h2>Your Current Weather</h2>
+        <div class="weather-search">
+            <input type="text" id="cityInput" placeholder="Or search a city...">
+            <button onclick="searchWeather()">🔍 Search</button>
+        </div>
+        
+        <div class="weather-box" id="weather">🌐 Detecting your location...</div>
+        <footer>© 2025 Windy Weather App • Built with ☀️ & ☁️</footer>
+    </section>
 
-    <div class="form-group" id="guestForm">
-      <input type="text" id="username" placeholder="Your Name 🌱">
-      <input type="text" id="location" placeholder="Your City 📍">
-      <button class="btn" onclick="continueAsGuest()">☁️ Check Weather</button>
-    </div>
-  </div>
-
-  <footer>© 2025 Windy Weather App • Built with ☀️ & ☁️ </footer>
-
-  <script src="assets/js/main.js"></script>
-  <script>
-    function showGuestForm() {
-      document.getElementById('guestForm').style.display = 'block';
-    }
-  </script>
+    <script src="assets/JS/script.js" defer></script>
 </body>
 </html>
