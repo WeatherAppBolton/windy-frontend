@@ -4,127 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🌤️ Login - Windy</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
-  <style>
-
-    @keyframes drift {
-      from { transform: translateX(0); }
-      to { transform: translateX(200vw); }
-    }
-
-    .msg {
-      margin-top: 15px;
-      font-size: 14px;
-    }
-
-    .msg.success {
-      color: #d4edda;
-      background: rgba(40, 167, 69, 0.2);
-      padding: 8px;
-      border-radius: 8px;
-    }
-
-    .msg.error {
-      color: #ffdede;
-      background: rgba(255, 0, 0, 0.2);
-      padding: 8px;
-      border-radius: 8px;
-    }
-
-    .back-link {
-      margin-top: 20px;
-      display: inline-block;
-      font-size: 14px;
-      text-decoration: none;
-      color: #eee;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/CSS/page2style.CSS">
 </head>
 <body data-page="login">
+
+  <div class="cloud"></div>
+  <div class="cloud"></div>
 
   <div class="container">
     <h1>🔐 Login to Windy</h1>
     <input type="email" id="loginEmail" placeholder="Email Address 📧" />
     <input type="password" id="loginPassword" placeholder="Password 🔐" />
-    <button type="button" onclick="loginUser()">✅ Login</button>
+    <button onclick="loginUser()">✅ Login</button>
     <p class="msg" id="loginMsg"></p>
     <a class="back-link" href="index.html">← Back to Home</a>
   </div>
 
   <footer>© 2025 Windy Weather App • Made with ☁️ </footer>
 
-  <script>
-function loginUser() {
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const password = document.getElementById('loginPassword').value;
-  const msg = document.getElementById('loginMsg');
-
-  msg.textContent = '';
-  msg.className = 'msg';
-
-  const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-  if (!email || !emailPattern.test(email)) {
-    msg.textContent = '⚠️ Enter a valid email.';
-    msg.classList.add('error');
-    return;
-  }
-
-  if (!password) {
-    msg.textContent = '⚠️ Password cannot be empty.';
-    msg.classList.add('error');
-    return;
-  }
-
-  fetch("https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  })
-  .then(async res => {
-    const raw = await res.text();
-    let data = {};
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      msg.textContent = '⚠️ Invalid response from server.';
-      msg.classList.add('error');
-      return;
-    }
-
-    if (res.ok && data.message === "Login successful") {
-      msg.textContent = '✅ Login successful! Redirecting...';
-      msg.classList.add('success');
-
-      localStorage.setItem("loggedInEmail", email); // existing
-      localStorage.removeItem("favorites");         // clear old session data
-      localStorage.removeItem("displayName");       // optional: reset username
-      localStorage.removeItem("activeTheme");       // optional: force DB theme
-
-      setTimeout(() => {
-        window.location.href = "dashboard_user.html";
-      }, 1500);
-    } else {
-      msg.textContent = '⚠️ ' + (data.error || 'Incorrect credentials.');
-      msg.classList.add('error');
-    }
-  })
-  .catch(() => {
-    msg.textContent = '⚠️ Error connecting to server.';
-    msg.classList.add('error');
-  });
-}
-  </script>
-
-  <script>
-  // Clear login state on page load
-  window.onload = function() {
-    localStorage.removeItem("loggedInEmail");
-  };
-  </script>
-  
+  <script src="assets/JS/script.js" defer></script>
 </body>
 </html>
