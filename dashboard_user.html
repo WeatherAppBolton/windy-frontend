@@ -3,40 +3,487 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>☁️ Windy - Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/CSS/page2style.CSS"> <!-- Link to dashboard-specific CSS -->
-</head>
-<body data-page="dashboard">
-  <div class="container">
+  <title>☁️ Windy - User Dashboard</title>
+
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #061707, #022006);
+      background-image: url('https://img.freepik.com/free-photo/dark-green-forest-river_1204-490.jpg?t=st=1745336700~exp=1745340300~hmac=43874abb05b31691a1ad64a4535cf5512935efcddc9726e12ac682888e7e48fc&w=1380');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #1b5e20;
+      font-size: 14px;
+    }
+
+    body.sunset {
+      background: linear-gradient(to bottom, #db8a21, #1f1e1e);
+      background-image: url('https://img.freepik.com/free-photo/inspiring-view-sunset-light_23-2148851746.jpg?t=st=1745358539~exp=1745362139~hmac=93182643efb89eb1d0529f742de7972cd7a13058d046318748ee3cfb9671b6f1&w=1380');
+      color: #4e342e;
+    }
+
+    body.night {
+      background: linear-gradient(to bottom, #000106, #2c3e50);
+      background-image: url('https://img.freepik.com/free-photo/bottom-view-starry-sky_23-2148282356.jpg?t=st=1745358670~exp=1745362270~hmac=15a88734bb919226a831441dca86b0efb130b289c90c870e6a1ccf73446db14e&w=1380');      
+      color: #f1f1f1;
+    }
+
+    .dashboard-container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+      margin-top: 30px;
+      padding: 25px 30px;
+      border-radius: 14px;
+      max-width: 420px;
+      width: 95%;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      text-align: center;
+      margin: 18px 0 10px;
+    }
+
+    .night h1, .night h3 {
+      color: #ffeb3b;
+    }
+
+    .logout-container {
+      width: 100%;
+      text-align: right;
+      margin-top: 10px;
+      padding: 0 20px;
+    }
+
+    .logout-btn {
+      background: #e53935;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .logout-btn:hover {
+      background: #b71c1c;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 7px 12px;
+      font-size: 0.85rem;
+      border: none;
+      border-radius: 6px;
+      margin-right: 8px;
+      background: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2e7d32;
+    }
+
+    .dashboard-section {
+      margin-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 15px;
+    }
+
+    .fav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .fav-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.12);
+      margin-bottom: 6px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .fav-list button {
+      background: #ef5350;
+      font-weight: bold;
+      padding: 3px 8px;
+      font-size: 0.8rem;
+    }
+
+    .fav-list button:hover {
+      background: #c62828;
+    }
+
+    #weatherResult {
+      text-align: center;
+      margin-top: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #e0f2f1;
+    }
+
+    .night footer {
+      color: #ccc;
+    }
+
+    #loader {
+      font-size: 1.1rem;
+      color: #fff;
+      margin-top: 100px;
+      text-align: center;
+    }
+
+    main.dashboard-container {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    main.dashboard-container.loaded {
+      opacity: 1;
+    }
+  </style>
+  </head>
+
+<body>
+  <div id="loader">Loading your dashboard...</div>
+  <div class="logout-container" style="display:none;">
     <button class="logout-btn" onclick="logoutUser()">🚪 Logout</button>
-    <h1>🌤️ Welcome, <span id="username">User</span></h1>
-
-    <div class="input-group">
-      <label for="city">Check Weather:</label>
-      <input type="text" id="city" placeholder="Enter a city...">
-      <button onclick="checkWeather()">🔍 Check Weather</button>
-      <button id="saveFavBtn" onclick="saveToFavorites()">⭐ Save to Favorites</button>
-    </div>
-
-    <div id="weatherResult"></div>
-
-    <div class="saved-list">
-      <h3>❤️ Saved Locations (<span id="favCount">0/3</span>)</h3>
-      <button id="refreshAllBtn" onclick="renderSaved()">🔁 Refresh All</button>
-      <ul id="savedCities"></ul>
-    </div>
-
-    <div class="settings">
-      <h3>⚙️ Profile Settings</h3>
-      <input type="text" id="editName" placeholder="Update name...">
-      <input type="email" id="editEmail" placeholder="Update email...">
-      <button onclick="updateProfile()">📂 Save Profile</button>
-    </div>
   </div>
 
-  <footer>© 2025 Windy Weather App • Made with ☁️</footer>
+  <main class="dashboard-container" style="display:none;">
+    <h1>🌤️ Welcome, <span id="username">User</span></h1>
+  
+    <!-- Weather Search -->
+    <section class="dashboard-section">
+      <h3>🔍 Search Weather</h3>
+      <input type="text" id="city" placeholder="Enter a city..." />
+      <button onclick="checkWeather()">Search</button>
+      <button onclick="saveToFavorites()">⭐ Save</button>
+    </section>
+  
+    <div id="weatherResult"></div>
+  
+    <!-- Favorites -->
+    <section class="dashboard-section">
+      <h3>❤️ Favorites (<span id="favCount">0/3</span>)</h3>
+      <button onclick="renderSaved()">🔁 Refresh</button>
+      <ul id="savedCities" class="fav-list"></ul>
+    </section>
+  
+    <!-- Profile -->
+    <section class="dashboard-section">
+      <h3>⚙️ Profile Settings</h3>
+      <select id="updateOption" onchange="renderProfileUpdateForm()">
+        <option value="">-- Choose what to update --</option>
+        <option value="name">Update Name</option>
+        <option value="email">Update Email</option>
+        <option value="password">Update Password</option>
+      </select>
+      <div id="profileUpdateFields"></div>
+      
+      <button onclick="submitProfileUpdate()">📂 Update</button>
+    </section>
+  
+    <!-- Theme -->
+    <section class="dashboard-section">
+      <h3>🎨 Choose Theme</h3>
+      <select id="themeSelect" onchange="changeTheme()">
+        <option value="default">🌳 Forest (Default)</option>
+        <option value="sunset">🌇 Sunset</option>
+        <option value="night">🌙 Night</option>
+      </select>
+    </section>
+  </main>
+  
+  <footer>© 2025 Windy Weather App • Built with nature 🌿</footer>
 
-  <script src="assets/JS/script.js"></script> <!-- Link to external JavaScript -->
+  <!-- The same script logic as you had -->
+  <script>
+    const GET_PREFS_URL = "https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/prefs";
+    const UPDATE_PREFS_URL = "https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/prefs";
+    const lambdaWeatherUrl = "https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather";
+
+    let lastSearchedCity = null;
+
+    let userEmail = localStorage.getItem("loggedInEmail");
+    let currentUserData = {};
+
+    window.onload = () => {
+      if (!userEmail) {
+        alert("User not logged in.");
+        window.location.href = "login.html";
+      } else {
+        loadDashboard();
+      }
+    };
+
+    function loadDashboard() {
+  fetch(`${GET_PREFS_URL}?email=${encodeURIComponent(userEmail)}`)
+    .then(res => res.json())
+    .then(data => {
+      currentUserData = data;
+
+      const defaultTheme = "default";
+      const defaultFavorites = [];
+
+      const theme = data.theme || defaultTheme;
+      const favorites = Array.isArray(data.favorites) ? data.favorites : defaultFavorites;
+
+      // Apply theme & preferences
+      document.body.className = theme;
+      document.getElementById("themeSelect").value = theme;
+      document.getElementById("username").textContent = data.name || userEmail.split("@")[0];
+
+      renderSavedFavorites(favorites).then(() => {
+  // ✅ Reveal only after favorites done
+  document.getElementById("loader").style.display = "none";
+  document.querySelector("main").style.display = "block";
+  document.querySelector(".logout-container").style.display = "block";
+  document.querySelector("main").classList.add("loaded");
+});
+
+      // Patch missing prefs if any
+      if (!data.theme || !Array.isArray(data.favorites)) {
+        updatePrefs({ theme, favorites });
+      }
+
+
+      // ✅ Apply fade-in effect after rendering
+      document.querySelector("main").classList.add("loaded");
+    })
+    .catch(err => {
+      console.error("Error loading dashboard:", err);
+      document.getElementById("loader").textContent = "❌ Failed to load dashboard.";
+    });
+}
+
+
+function checkWeather() {
+  const city = document.getElementById("city").value.trim();
+  if (!city) return;
+
+  fetch(`${lambdaWeatherUrl}?location=${encodeURIComponent(city)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || !data.temperature || !data.condition) throw new Error("Invalid weather data");
+
+      lastSearchedCity = city; // ✅ Mark as valid search
+      document.getElementById("weatherResult").innerHTML = `
+        <h3>📍 ${data.location}</h3>
+        <p>🌡️ Temp: ${data.temperature}°C</p>
+        <p>🌦️ Condition: <em>${data.condition.charAt(0).toUpperCase() + data.condition.slice(1)}</em></p>
+      `;
+    })
+    .catch(() => {
+      lastSearchedCity = null; // ❌ Reset on error
+      document.getElementById("weatherResult").textContent = "❌ Could not fetch weather.";
+    });
+}
+
+
+function saveToFavorites() {
+  const city = document.getElementById("city").value.trim();
+  if (!city || city !== lastSearchedCity) {
+    return alert("⚠️ Please search the city first and then save it.");
+  }
+
+  let favs = Array.isArray(currentUserData.favorites) ? [...currentUserData.favorites] : [];
+  if (favs.includes(city)) return alert("Already added.");
+  if (favs.length >= 3) return alert("Only 3 favorites allowed.");
+
+  favs.push(city);
+  updatePrefs({ favorites: favs }, () => {
+    currentUserData.favorites = favs;
+    renderSavedFavorites(favs);
+    lastSearchedCity = null; // ✅ Reset to require fresh search
+  });
+}
+
+
+    function renderSavedFavorites(favs) {
+  document.getElementById("savedCities").innerHTML = "";
+  document.getElementById("favCount").textContent = `${favs.length}/3`;
+
+  const fetches = favs.map(city => {
+    return fetch(`${lambdaWeatherUrl}?location=${encodeURIComponent(city)}`)
+      .then(res => res.json())
+      .then(data => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${data.location} - ${data.temperature}°C 
+          <button data-city="${city}">❌</button>
+        `;
+        li.querySelector("button").onclick = (e) => {
+          const cityToRemove = e.target.getAttribute("data-city");
+          const updatedFavs = favs.filter(c => c !== cityToRemove);
+          updatePrefs({ favorites: updatedFavs }, () => {
+            currentUserData.favorites = updatedFavs;
+            renderSavedFavorites(updatedFavs);
+          });
+        };
+        document.getElementById("savedCities").appendChild(li);
+      })
+      .catch(err => console.error("Error fetching favorite weather:", err));
+  });
+
+  return Promise.all(fetches); 
+}
+
+    function renderSaved() {
+      loadDashboard();
+    }
+
+    function changeTheme() {
+  const theme = document.getElementById("themeSelect").value;
+  document.body.className = theme;
+  updatePrefs({ theme }, () => {
+    currentUserData.theme = theme;
+  });
+}
+
+    function renderProfileUpdateForm() {
+      const option = document.getElementById("updateOption").value;
+      const container = document.getElementById("profileUpdateFields");
+      container.innerHTML = "";
+
+      if (option === "email" || option === "password") {
+  container.innerHTML += `<input type="password" id="currentPassword" placeholder="Enter current password" />`;
+}
+
+      if (option === "name") {
+        container.innerHTML = `<input type="text" id="newName" placeholder="New name" />`;
+      } else if (option === "email") {
+        container.innerHTML = `
+          <input type="email" id="newEmail" placeholder="New email" />
+          <input type="email" id="confirmEmail" placeholder="Confirm email" />
+        `;
+      } else if (option === "password") {
+        container.innerHTML = `
+          <input type="password" id="newPassword" placeholder="New password" />
+          <input type="password" id="confirmPassword" placeholder="Confirm password" />
+        `;
+      }
+    }
+
+    function submitProfileUpdate() {
+  const option = document.getElementById("updateOption").value;
+  if (!option) return;
+
+  let updateObj = { email: userEmail };
+
+  const currentPassword = document.getElementById("currentPassword")?.value;
+if ((option === "email" || option === "password") && !currentPassword) {
+  return alert("Please enter your current password for verification.");
+}
+if (option === "email" || option === "password") {
+  updateObj.currentPassword = currentPassword;
+}
+
+
+      if (option === "name") {
+        const name = document.getElementById("newName").value.trim();
+        
+        if (!name) return alert("Enter name");
+        updateObj.name = name;
+      }
+
+      if (option === "email") {
+        const newEmail = document.getElementById("newEmail").value.trim().toLowerCase();
+        const confirm = document.getElementById("confirmEmail").value.trim().toLowerCase();
+        if (newEmail !== confirm) return alert("Emails do not match.");
+        updateObj.email = newEmail;
+        updateObj.previousEmail = userEmail;
+        userEmail = newEmail;
+        localStorage.setItem("loggedInEmail", newEmail);
+      }
+
+      if (option === "password") {
+  const pass = document.getElementById("newPassword").value;
+  const confirm = document.getElementById("confirmPassword").value;
+  if (pass !== confirm) return alert("Passwords do not match.");
+
+  const pwValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,12}$/;
+  if (!pwValid.test(pass)) return alert("Password must be 8–12 chars, include upper, lower, digit, and special.");
+
+  updateObj.password = pass;
+}
+
+updatePrefs(updateObj);
+
+const updateFields = document.getElementById("profileUpdateFields");
+updateFields.querySelectorAll("p").forEach(p => p.remove());
+
+document.getElementById("profileUpdateFields").innerHTML += 
+  '<p style="color:green; font-size:0.9rem; margin-top:8px;">✔️ Profile updated!</p>';
+
+// Refresh after a short delay
+setTimeout(() => loadDashboard(), 1500);
+    }
+
+    function updatePrefs(prefs, callback) {
+  fetch(UPDATE_PREFS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: userEmail, ...prefs })
+  })
+  .then(res => res.json())
+  .then(response => {
+    // Merge new data into currentUserData
+    if (prefs.theme) currentUserData.theme = prefs.theme;
+    if (prefs.favorites) currentUserData.favorites = prefs.favorites;
+
+    if (typeof callback === 'function') {
+      callback(response);
+    }
+  })
+  .catch(err => console.error("Error updating preferences:", err));
+}
+
+
+
+    function logoutUser() {
+      localStorage.removeItem("loggedInEmail");
+      window.location.href = "login.html";
+    }
+  </script>
 </body>
 </html>

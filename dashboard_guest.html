@@ -3,31 +3,184 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🌤️ Windy - Weather Results</title>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/CSS/page2style.CSS">
+  <title>🌤️ Windy - Forest Weather</title>
+
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      text-align: center;
+      padding: 30px;
+      margin: 0;
+      background: linear-gradient(to bottom, #dcedc8, #a5d6a7);
+      background-image: url('https://img.freepik.com/free-photo/dark-green-forest-river_1204-490.jpg?t=st=1745336700~exp=1745340300~hmac=43874abb05b31691a1ad64a4535cf5512935efcddc9726e12ac682888e7e48fc&w=1380');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: #2e7d32;
+    }
+
+    .container {
+  width: 90%;
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 25px 30px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 32px rgba(60, 100, 60, 0.4);
+  backdrop-filter: blur(14px); 
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.3); 
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #aff68b;
+    }
+
+    #greeting {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: rgb(203, 228, 190);
+    }
+
+    #locationPrompt input {
+      padding: 12px;
+      width: 70%;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #060806;
+      margin-top: 10px;
+    }
+
+    #submitLocation {
+      padding: 12px 24px;
+      font-size: 1rem;
+      background: #66bb6a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #submitLocation:hover {
+      background: #558b2f;
+    }
+
+    #weatherResult {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 15px;
+      background: #f1f8e9;
+      border: 1px solid #c5e1a5;
+    }
+
+    .back-button {
+      margin-top: 20px;
+      background: #aed581;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #1b5e20;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 0.9rem;
+      color: #fafdf9;
+    }
+
+    @keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+  </style>
+
 </head>
-<body data-page="weather">
 
-  <!-- Animated Clouds -->
-  <div class="cloud"></div>
-  <div class="cloud"></div>
-
-  <!-- Single container (weather display) -->
+<body>
   <div class="container">
-    <h1>🌦️ Weather Forecast</h1>
+    <h1>🌧️ Weather Forecast</h1>
     <div id="greeting">Checking user data...</div>
 
     <div id="locationPrompt" style="display: none;">
       <input type="text" id="locationInput" placeholder="Enter your city..." />
+      <br/>
       <button id="submitLocation">🔍 Check Weather</button>
     </div>
+
+    <div id="weatherResult"></div>
 
     <button class="back-button" onclick="window.location.href='index.html'">← Back to Home</button>
   </div>
 
-  <footer>© 2025 Windy Weather App • Powered by ☀️ and APIs</footer>
+  <footer>© 2025 Windy Weather App • Nature Powered ✨🌿</footer>
 
-  <script src="assets/JS/script.js" defer></script>
+  <script>
+    const apiUrl = "https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather";
+  
+    const greetingEl = document.getElementById("greeting");
+    const locationPromptEl = document.getElementById("locationPrompt");
+    const locationInputEl = document.getElementById("locationInput");
+    const submitBtn = document.getElementById("submitLocation");
+    const weatherResultEl = document.getElementById("weatherResult");
+  
+    const storedName = localStorage.getItem("username") || "Guest";
+    const passedLocation = localStorage.getItem("location");
+  
+    greetingEl.innerHTML = `👋 Hello, <strong>${storedName.charAt(0).toUpperCase() + storedName.slice(1)}</strong>!`;
+    locationPromptEl.style.display = "block";
+  
+    if (passedLocation) {
+      fetchWeather(passedLocation);
+    } else {
+      weatherResultEl.innerHTML = "<p>🌍 No location selected yet. Try searching above!</p>";
+    }
+  
+    submitBtn.addEventListener("click", () => {
+      const inputLoc = locationInputEl.value.trim();
+      if (!inputLoc) {
+        alert("Please enter a location.");
+        return;
+      }
+      localStorage.setItem("location", inputLoc);
+      fetchWeather(inputLoc);
+    });
+  
+    function fetchWeather(location) {
+      weatherResultEl.innerHTML = "<p>⏳ Fetching weather data...</p>";
+  
+      fetch(`${apiUrl}?location=${encodeURIComponent(location)}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Weather fetch failed");
+          return res.json();
+        })
+        .then((data) => {
+          if (!data || !data.temperature || !data.condition) {
+            throw new Error("Incomplete data from server");
+          }
+  
+          const capitalCondition = data.condition.charAt(0).toUpperCase() + data.condition.slice(1);
+          weatherResultEl.innerHTML = `
+            <h2>📍 ${data.location}</h2>
+            <p>🌡️ Temperature: <strong>${data.temperature}°C</strong></p>
+            <p>🌦️ Condition: <em>${capitalCondition}</em></p>
+          `;
+        })
+        .catch((err) => {
+          weatherResultEl.innerHTML = `<p>❌ Could not fetch weather. Please check the city name or try again later.</p>`;
+          console.error("Weather Fetch Error:", err);
+        });
+    }
+  </script>
+  
 </body>
 </html>
