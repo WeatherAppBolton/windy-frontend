@@ -7,10 +7,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
   <style>
-    /* Page-specific styles for welcome animation only */
+    .weather-box {
+  margin: 30px auto;
+  padding: 25px 30px;
+  width: fit-content;
+  max-width: 90%;
+  text-align: center;
+  font-size: 1.1rem;
+
+  background: rgba(255, 255, 255, 0.08); /* Light transparent */
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.weather-box strong {
+  color: #ffeb3b; /* Highlighted city & temp */
+}
+
+.weather-box em {
+  color: #d0e6ff;
+  font-style: italic;
+}
     .cloud {
       position: absolute;
-      background: url('https://svgshare.com/i/xoJ.svg') no-repeat center;
+      background: green no-repeat center;
       background-size: contain;
       width: 240px;
       height: 120px;
@@ -24,51 +50,134 @@
       from { transform: translateX(0); }
       to { transform: translateX(200vw); }
     }
-
-    .form-group {
-      margin-top: 20px;
-      display: none;
-      animation: fadeIn 0.6s ease forwards;
-    }
   </style>
 </head>
+
 <body>
-    <header> 
-        <h2 class="logo">Windy🌦️</h2>
-        <div class="nav-wrapper">
-            <nav class="navigation">
-                <a href="#" class="active">Home</a>
-                <a href="login.html">Login</a>
-                <a href="register.html">Register</a>
-                <a href="about.html">About</a>
-            </nav>
-        </div>
-    </header>
+  <header> 
+    <h2 class="logo">Windy🌦️</h2>
+    <div class="nav-wrapper">
+      <nav class="navigation">
+        <a href="#" class="active">Home</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
 
-    <section class="parallax">
-        <img src="assets/images/hill1.png" alt="hill1" id="hill1">
-        <img src="assets/images/hill2.png" alt="hill2" id="hill2">
-        <img src="assets/images/hill3.png" alt="hill3" id="hill3">
-        <img src="assets/images/hill4.png" alt="hill4" id="hill4">
-        <img src="assets/images/hill5.png" alt="hill5" id="hill5">
-        <img src="assets/images/tree.png" alt="tree" id="tree">
-        <h2 id="text">Welcome to Windy🌦️</h2>
-        <p id="text1">Discover the weather like never before!</p>
-        <img src="assets/images/leaf.png" alt="leaf" id="leaf">
-        <img src="assets/images/plant.png" alt="plant" id="plant">
-    </section>
+  <section class="parallax">
+    <img src="assets/images/hill1.png" alt="hill1" id="hill1">
+    <img src="assets/images/hill2.png" alt="hill2" id="hill2">
+    <img src="assets/images/hill3.png" alt="hill3" id="hill3">
+    <img src="assets/images/hill4.png" alt="hill4" id="hill4">
+    <img src="assets/images/hill5.png" alt="hill5" id="hill5">
+    <img src="assets/images/tree.png" alt="tree" id="tree">
+    <h2 id="text">Welcome to Windy🌦️</h2>
+    <p id="text1">Discover the weather like never before!</p>
+    <img src="assets/images/leaf.png" alt="leaf" id="leaf">
+    <img src="assets/images/plant.png" alt="plant" id="plant">
+  </section>
 
-    <section class="sec">
-        <h2>Your Current Weather</h2>
-        <div class="weather-search">
-            <input type="text" id="cityInput" placeholder="Or search a city...">
-            <button onclick="searchWeather()">🔍 Search</button>
-        </div>
-        
-        <div class="weather-box" id="weather">🌐 Detecting your location...</div>
-        <footer>© 2025 Windy Weather App • Built with ☀️ & ☁️</footer>
-    </section>
+  <section class="sec">
+    <h2>Your Current Weather</h2>
+    <div class="weather-search">
+      <input type="text" id="username" placeholder="Your Name" />
+      <input type="text" id="cityInput" placeholder="City or Country" />
+      <button onclick="searchWeather()">🔍 Search</button>
+    </div>
+    <div class="weather-box" id="weather">🌐 Detecting your location...</div>
+    <footer>© 2025 Windy Weather App • Built with ☀️ & ☁️</footer>
+  </section>
 
-    <script src="assets/JS/script.js" defer></script>
+  <script>
+
+    function searchWeather() {
+      const city = document.getElementById('cityInput').value.trim();
+      const uname = document.getElementById('username').value.trim();
+
+      if (!city || !uname) {
+        alert("Please enter both your name and city.");
+        return;
+      }
+
+      // Save info and redirect
+      localStorage.setItem("username", uname);
+      localStorage.setItem("location", city);
+      window.location.href = "dashboard_guest.html";
+    }
+
+const cityInput = document.getElementById('cityInput');
+const weatherBox = document.getElementById('weather');
+
+// Try to get user's location when page loads
+window.addEventListener("DOMContentLoaded", () => {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  } else {
+    weatherBox.innerText = "🌍 Geolocation not supported by your browser.";
+  }
+});
+
+function showPosition(position) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+
+  const geoUrl = `https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather?lat=${lat}&lon=${lon}`;
+  fetch(geoUrl)
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.city) {
+        const city = data.city;
+        //cityInput.value = city;
+        localStorage.setItem("location", city);
+        fetchWeatherData(city); 
+      } else {
+        weatherBox.innerText = "❌ Could not detect your city. Try entering manually.";
+      }
+    })
+    .catch(err => {
+      console.error("Geolocation fetch error:", err);
+      weatherBox.innerText = "❌ Failed to fetch your location. Please try again.";
+    });
+}
+
+
+function fetchWeatherData(city) {
+  const weatherUrl = `https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather?location=${encodeURIComponent(city)}`;
+
+  fetch(weatherUrl)
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.temperature && data.condition) {
+        const capitalCondition = data.condition.charAt(0).toUpperCase() + data.condition.slice(1);
+
+        // ✅ Add this here:
+        weatherBox.innerHTML = `
+          <h3>📍 <strong>${data.location}</strong></h3>
+          <p>🌡️ Temperature: <strong>${data.temperature}°C</strong></p>
+          <p>🌦️ Condition: <em>${capitalCondition}</em></p>
+        `;
+      } else {
+        weatherBox.innerText = "❌ Weather data unavailable for this location.";
+      }
+    })
+    .catch(err => {
+      console.error("Weather fetch error:", err);
+      weatherBox.innerText = "❌ Failed to fetch weather data.";
+    });
+}
+
+
+function showError(error) {
+  const messages = {
+    1: "❌ Location permission denied.",
+    2: "❌ Location unavailable.",
+    3: "❌ Location request timed out."
+  };
+  weatherBox.innerText = messages[error.code] || "❌ An unknown error occurred.";
+}
+</script>
+
 </body>
 </html>
