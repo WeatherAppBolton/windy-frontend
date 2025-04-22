@@ -29,4 +29,5 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
       run: |
-        aws s3 sync windy-frontend/ s3://$S3_BUCKET --delete --region $AWS_REGION --exclude ".git/*"
+        aws s3 sync ./ s3://$S3_BUCKET --delete --region $AWS_REGION --exclude ".git/*" --exclude ".github/*"
+
