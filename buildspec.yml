@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo "✅ No dependencies to install for static frontend"
+
+  build:
+    commands:
+      - echo "🚀 Starting S3 sync"
+      - aws s3 sync . s3://windy-app2/ --delete
+      - echo "✅ Deployment complete"
+
+artifacts:
+  files:
+    - '**/*'
