@@ -149,8 +149,8 @@ function showPosition(position) {
 }
 
 function fetchWeatherData(city) {
+    weatherBox.innerHTML = "⏳ Fetching weather data..."; 
   const weatherUrl = `https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather?location=${encodeURIComponent(city)}`;
-  weatherBox.innerHTML = "⏳ Fetching weather data..."; // Add loading spinner text
   fetch(weatherUrl)
     .then(res => res.json())
     .then(data => {
