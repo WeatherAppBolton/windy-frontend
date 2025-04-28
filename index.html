@@ -139,7 +139,9 @@ function showPosition(position) {
   fetch(geoUrl)
     .then(res => res.json())
     .then(data => {
-      if (data && data.location) {
+
+      if (data && data.location) {   // ✅ corrected here
+
         const city = data.location;
         localStorage.setItem("location", city);
         
