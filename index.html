@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🌤️ Windy - Welcome</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
   <style>
@@ -130,9 +128,8 @@ function showPosition(position) {
   fetch(geoUrl)
     .then(res => res.json())
     .then(data => {
-      if (data && data.city) {
-        const city = data.city;
-        //cityInput.value = city;
+      if (data && data.location) {   // ✅ corrected here
+        const city = data.location;
         localStorage.setItem("location", city);
         fetchWeatherData(city); 
       } else {
@@ -144,6 +141,7 @@ function showPosition(position) {
       weatherBox.innerText = "❌ Failed to fetch your location. Please try again.";
     });
 }
+
 
 
 function fetchWeatherData(city) {
@@ -180,32 +178,6 @@ function showError(error) {
   };
   weatherBox.innerText = messages[error.code] || "❌ An unknown error occurred.";
 }
-
-
-// Scroll Event for Parallax Effect
-document.addEventListener('DOMContentLoaded', () => {
-  const text = document.getElementById('text');
-  const text1 = document.getElementById('text1');
-  const leaf = document.getElementById('leaf');
-  const hill1 = document.getElementById('hill1');
-  const hill4 = document.getElementById('hill4');
-  const hill5 = document.getElementById('hill5'); 
-
-  window.addEventListener('scroll', () => {
-      const value = window.scrollY; // Get current scroll position
-
-      // Apply transformations based on the scroll position
-      if (text) text.style.marginTop = value * 2.5 + 'px';
-      if (text1) text1.style.marginTop = value * 2.5 + 'px';
-      if (leaf) {
-          leaf.style.top = value * -1.5 + 'px';
-          leaf.style.left = value * 1.5 + 'px';
-      }
-      if (hill5) hill5.style.left = value * 1.5 + 'px';
-      if (hill4) hill4.style.left = value * -1.5 + 'px';
-      if (hill1) hill1.style.top = value * 1 + 'px';
-  });
-});
 </script>
 
 </body>
