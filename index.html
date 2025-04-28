@@ -119,28 +119,35 @@ window.addEventListener("DOMContentLoaded", () => {
     weatherBox.innerText = "🌍 Geolocation not supported by your browser.";
   }
 });
-
 function showPosition(position) {
   const lat = position.coords.latitude;
   const lon = position.coords.longitude;
+
+  weatherBox.innerHTML = "⏳ Detecting your city...";  // Add spinner text
 
   const geoUrl = `https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather?lat=${lat}&lon=${lon}`;
   fetch(geoUrl)
     .then(res => res.json())
     .then(data => {
-      if (data && data.location) {   // ✅ corrected here
+      if (data && data.location) {
         const city = data.location;
         localStorage.setItem("location", city);
-        fetchWeatherData(city); 
+        
+        weatherBox.innerHTML = `
+          <h3>📍 <strong>${city}</strong></h3>
+          <p>🌡️ Temperature: <strong>${data.temperature}°C</strong></p>
+          <p>🌦️ Condition: <em>${data.condition}</em></p>
+        `;
       } else {
         weatherBox.innerText = "❌ Could not detect your city. Try entering manually.";
       }
     })
     .catch(err => {
       console.error("Geolocation fetch error:", err);
-      weatherBox.innerText = "❌ Failed to fetch your location. Please try again.";
+      weatherBox.innerText = "❌ Failed to fetch your location.";
     });
 }
+
 
 
 
