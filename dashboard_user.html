@@ -236,76 +236,102 @@
   
   <footer>© 2025 Windy Weather App • Built with nature 🌿</footer>
 
-  <!-- The same script logic as you had -->
   <script>
-    const GET_PREFS_URL = "https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/prefs";
-    const UPDATE_PREFS_URL = "https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/prefs";
-    const lambdaWeatherUrl = "https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather";
+let userEmail = null;
+let currentUserData = {};
+let lastSearchedCity = null;
+const clientId = "3bvu8nkaaup0has9jmv1o9pa0a";
+const redirectUri = "https://main.d10w39dyzelxrv.amplifyapp.com/dashboard_user.html";
+const region = "eu-north-1";
+const domain = "eu-north-11ot2rvha8";
 
-    const clientId = "3bvu8nkaaup0has9jmv1o9pa0a"; // your Cognito App Client ID
-  const redirectUri = "https://main.d10w39dyzelxrv.amplifyapp.com/dashboard_user.html";
-  const region = "eu-north-1";
-  const domain = "eu-north-11ot2rvha8"; // your Cognito subdomain
+// ✅ Your API URLs – Make sure they are declared before use
+const GET_PREFS_URL = "https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/prefs";
+const UPDATE_PREFS_URL = "https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/prefs";
+const lambdaWeatherUrl = "https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather";
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const code = urlParams.get("code");
+// ✅ Step 1: Extract code if present
+const urlParams = new URLSearchParams(window.location.search);
+const code = urlParams.get("code");
 
-  if (code) {
-    // Hide everything until auth is complete
-    document.body.innerHTML = '<div id="loader">🔐 Logging you in...</div>';
+if (code) {
+  // STEP 2: Exchange code for tokens
+  document.body.innerHTML = '<div id="loader">🔐 Logging you in...</div>';
+  const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
+  const params = new URLSearchParams();
+  params.append("grant_type", "authorization_code");
+  params.append("client_id", clientId);
+  params.append("code", code);
+  params.append("redirect_uri", redirectUri);
 
-    const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
-    const params = new URLSearchParams();
-    params.append("grant_type", "authorization_code");
-    params.append("client_id", clientId);
-    params.append("code", code);
-    params.append("redirect_uri", redirectUri);
-
-    fetch(tokenUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params
-    })
+  fetch(tokenUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params
+  })
     .then(res => res.json())
     .then(data => {
-      if (data.access_token) {
-        // Save tokens
+      if (data.access_token && data.id_token) {
+        // ✅ Save to localStorage
         localStorage.setItem("access_token", data.access_token);
         localStorage.setItem("id_token", data.id_token);
 
-        // Extract email from decoded ID token (for dashboard personalization)
-        const idPayload = JSON.parse(atob(data.id_token.split('.')[1]));
-        const email = idPayload.email;
-        localStorage.setItem("loggedInEmail", email);
+        // ✅ Decode ID token and store email
+        try {
+          const payload = JSON.parse(atob(data.id_token.split('.')[1]));
+          const email = payload.email;
+          if (email) {
+            localStorage.setItem("loggedInEmail", email);
+          }
+        } catch (e) {
+          console.error("❌ Token decode failed:", e);
+        }
 
-        // ✅ Reload page without code= in URL
+        // ✅ Reload cleanly (removes ?code)
         const cleanUrl = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, cleanUrl);
-
-        // ✅ Continue with your existing logic
         window.location.reload();
       } else {
-        document.body.innerHTML = `<p style="color:red;">❌ Token exchange failed. ${data.error_description || data.error}</p>`;
+        document.body.innerHTML = `<p style="color:red;">❌ Token exchange failed: ${data.error_description || data.error}</p>`;
       }
     })
     .catch(err => {
-      document.body.innerHTML = `<p style="color:red;">❌ Error logging in: ${err.message}</p>`;
+      document.body.innerHTML = `<p style="color:red;">❌ Network error: ${err.message}</p>`;
     });
+
+} else {
+  // STEP 3: Check local storage fallback
+  userEmail = localStorage.getItem("loggedInEmail");
+
+  if (!userEmail) {
+    const idToken = localStorage.getItem("id_token");
+    if (idToken) {
+      try {
+        const payload = JSON.parse(atob(idToken.split('.')[1]));
+        const email = payload.email;
+        if (email) {
+          userEmail = email;
+          localStorage.setItem("loggedInEmail", email);
+        }
+      } catch (err) {
+        console.error("❌ Failed to decode fallback token:", err);
+      }
+    }
   }
 
-    let lastSearchedCity = null;
+  // STEP 4: Still no login? Force redirect
+  if (!userEmail) {
+    alert("Please log in first.");
+    const loginUrl = `https://${domain}.auth.${region}.amazoncognito.com/login?client_id=${clientId}&response_type=code&scope=email+openid+profile&redirect_uri=${redirectUri}`;
+    window.location.href = loginUrl;
+  } else {
+    // STEP 5: Safe to start dashboard
+    document.getElementById("loader").style.display = "block";
+    document.querySelector("main").style.display = "none";
+    loadDashboard();
+  }
+}
 
-    let userEmail = localStorage.getItem("loggedInEmail");
-    let currentUserData = {};
-
-    window.onload = () => {
-      if (!userEmail) {
-        alert("User not logged in.");
-        window.location.href = "login.html";
-      } else {
-        loadDashboard();
-      }
-    };
 
     function loadDashboard() {
   fetch(`${GET_PREFS_URL}?email=${encodeURIComponent(userEmail)}`)
@@ -533,8 +559,12 @@ setTimeout(() => loadDashboard(), 1500);
 
     function logoutUser() {
       localStorage.removeItem("loggedInEmail");
-      window.location.href = "login.html";
-    }
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("id_token");
+      window.location.href = `https://${domain}.auth.${region}.amazoncognito.com/logout?client_id=${clientId}&logout_uri=${redirectUri}`;
+}
+
+  
   </script>
 </body>
 </html>
