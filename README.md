@@ -24,6 +24,12 @@ It is built with vanilla **HTML, CSS, and JavaScript** and hosted on **AWS S3** 
 │   │   └── styles.css        # Main CSS styles
 │   └── js/
 │       └── main.js           # JS logic (API calls, routing)
+├── package.json
+├── about.html
+├── README.md
+├── .github/
+     └──workflows/
+        └──frontend-deploy.yml
 ```
 
 ---
