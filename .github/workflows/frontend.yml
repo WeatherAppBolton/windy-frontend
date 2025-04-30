@@ -1,0 +1,91 @@
+name: ✨ Deploy Windy Frontend to S3 + Amplify!
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📅 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🚀 Set up Python (for AWS CLI)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: 📦 Install tools (AWS CLI + Minifiers)
+        run: |
+          pip install awscli
+          npm install -g html-minifier terser clean-css-cli
+
+      - name: 🧼 Lint and Minify Assets
+        run: |
+          echo "🔧 Minifying HTML, CSS, JS..."
+          find . -name "*.html" -exec html-minifier \
+            --collapse-whitespace \
+            --remove-comments \
+            --minify-css true \
+            --minify-js true \
+            -o {} {} \;
+          find . -name "*.css" -exec cleancss -o {} {} \;
+          find . -name "*.js" -exec terser --compress --mangle -o {} -- {} \;
+
+      - name: 🌌 Deploy to S3 (only on main)
+        if: github.ref == 'refs/heads/main'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          echo "🚀 Syncing frontend to S3 bucket: $S3_BUCKET"
+          aws s3 sync ./ s3://$S3_BUCKET \
+            --delete \
+            --region $AWS_REGION \
+            --cache-control "max-age=31536000" \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "tests/*" || exit 1
+
+      - name: 📢 Notify via SNS – ✅ Success
+        if: success() && env.SNS_TOPIC_ARN != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          SNS_TOPIC_ARN: ${{ secrets.SNS_TOPIC_ARN }}
+        run: |
+          COMMIT=$(git rev-parse --short HEAD)
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          aws sns publish \
+            --topic-arn "$SNS_TOPIC_ARN" \
+            --region "$AWS_REGION" \
+            --message "✅ Frontend deployed successfully 🚀
+            Branch: $BRANCH
+            Commit: $COMMIT"
+
+      - name: 📢 Notify via SNS – ❌ Failure
+        if: failure() && env.SNS_TOPIC_ARN != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          SNS_TOPIC_ARN: ${{ secrets.SNS_TOPIC_ARN }}
+        run: |
+          COMMIT=$(git rev-parse --short HEAD)
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          aws sns publish \
+            --topic-arn "$SNS_TOPIC_ARN" \
+            --region "$AWS_REGION" \
+            --message "❌ Frontend deployment FAILED ❗
+            Branch: $BRANCH
+            Commit: $COMMIT
+            Check logs for details."
