@@ -1,4 +1,4 @@
-name: ✨ Deploy Windy Frontend to S3 + Amplify!
+name: ✨ Build & Deploy Windy Frontend
 
 on:
   push:
@@ -9,7 +9,8 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
+    name: 🛠️ Lint + Minify
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: 📦 Install tools (AWS CLI + Minifiers)
+      - name: 📦 Install Tools (AWS CLI + Minifiers)
         run: |
           pip install awscli
           npm install -g html-minifier terser clean-css-cli
@@ -38,18 +39,30 @@ jobs:
           find . -name "*.css" -exec cleancss -o {} {} \;
           find . -name "*.js" -exec terser --compress --mangle -o {} -- {} \;
 
-      - name: 🌌 Deploy to S3 (only on main)
-        if: github.ref == 'refs/heads/main'
+  deploy:
+    name: 🚀 Deploy to S3 (Only on main)
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📅 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🧰 Install AWS CLI
+        run: pip install awscli
+
+      - name: 📤 Sync to S3 Bucket
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
         run: |
-          echo "🚀 Syncing frontend to S3 bucket: $S3_BUCKET"
+          echo "🌐 Deploying to S3: $S3_BUCKET"
           aws s3 sync ./ s3://$S3_BUCKET \
+            --region "$AWS_REGION" \
             --delete \
-            --region $AWS_REGION \
             --cache-control "max-age=31536000" \
             --exclude ".git/*" \
             --exclude ".github/*" \
