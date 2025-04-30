@@ -242,6 +242,57 @@
     const UPDATE_PREFS_URL = "https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/prefs";
     const lambdaWeatherUrl = "https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather";
 
+    const clientId = "3bvu8nkaaup0has9jmv1o9pa0a"; // your Cognito App Client ID
+  const redirectUri = "https://main.d10w39dyzelxrv.amplifyapp.com/dashboard_user.html";
+  const region = "eu-north-1";
+  const domain = "eu-north-11ot2rvha8"; // your Cognito subdomain
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get("code");
+
+  if (code) {
+    // Hide everything until auth is complete
+    document.body.innerHTML = '<div id="loader">🔐 Logging you in...</div>';
+
+    const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
+    const params = new URLSearchParams();
+    params.append("grant_type", "authorization_code");
+    params.append("client_id", clientId);
+    params.append("code", code);
+    params.append("redirect_uri", redirectUri);
+
+    fetch(tokenUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.access_token) {
+        // Save tokens
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("id_token", data.id_token);
+
+        // Extract email from decoded ID token (for dashboard personalization)
+        const idPayload = JSON.parse(atob(data.id_token.split('.')[1]));
+        const email = idPayload.email;
+        localStorage.setItem("loggedInEmail", email);
+
+        // ✅ Reload page without code= in URL
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+
+        // ✅ Continue with your existing logic
+        window.location.reload();
+      } else {
+        document.body.innerHTML = `<p style="color:red;">❌ Token exchange failed. ${data.error_description || data.error}</p>`;
+      }
+    })
+    .catch(err => {
+      document.body.innerHTML = `<p style="color:red;">❌ Error logging in: ${err.message}</p>`;
+    });
+  }
+
     let lastSearchedCity = null;
 
     let userEmail = localStorage.getItem("loggedInEmail");
