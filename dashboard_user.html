@@ -353,36 +353,31 @@
       if (!data.id_token) throw new Error("Missing token response");
 
       // Step 2: Store tokens, cleanup URL
-      storeTokens(data);
-      console.log("✅ Stored ID token:", localStorage.getItem("id_token")); // Debug token save
+// Store tokens
+storeTokens(data);
+console.log("✅ Stored ID token:", localStorage.getItem("id_token"));
 
-      const cleanUrl = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, cleanUrl);
+// Clean up the URL (removes ?code=...)
+const cleanUrl = window.location.origin + window.location.pathname;
+window.history.replaceState({}, document.title, cleanUrl);
 
-      // ✅ Delay reload to allow localStorage + JS to settle
-      setTimeout(() => {
-        window.location.reload();
-      }, 300);
+// ✅ Instead of returning, continue directly
+userEmail = tryLoadFromStorage();
+if (!userEmail) return clearTokensAndRedirect();
 
-      return;
+const userData = await fetchUserData(userEmail);
+if (!userData) return clearTokensAndRedirect();
+
+currentUserData = userData;
+loadDashboard();
+return;
+
     } catch (err) {
       console.error("❌ Login flow failed:", err);
       document.getElementById("loader").textContent = "❌ Login failed. Please retry.";
       return;
     }
   }
-
-  // Step 3: Token from localStorage must be valid
-  userEmail = tryLoadFromStorage();
-  if (!userEmail) return clearTokensAndRedirect();
-
-  // Step 4: Check DB for user existence
-  const userData = await fetchUserData(userEmail);
-  if (!userData) return clearTokensAndRedirect();
-
-  // Step 5: Load user data into app
-  currentUserData = userData;
-  loadDashboard();
 }
 
   window.onload = init;
