@@ -61,16 +61,9 @@
       <nav class="navigation">
         <a href="#" class="active">Home</a>
 
-      <!-- <a href="login.html">Login</a> -->
-      <a href="https://eu-north-11ot2rvha8.auth.eu-north-1.amazoncognito.com/login/continue?client_id=3bvu8nkaaup0has9jmv1o9pa0a&response_type=code&scope=email+openid+profile&redirect_uri=https://main.d10w39dyzelxrv.amplifyapp.com/dashboard_user.html">
-        🔐 Login Securely with Cognito
-      </a>
-      
-      <!-- <a href="register.html">Register</a> -->
-    <a href="https://eu-north-11ot2rvha8.auth.eu-north-1.amazoncognito.com/signup?client_id=3bvu8nkaaup0has9jmv1o9pa0a&redirect_uri=https%3A%2F%2Fmain.d10w39dyzelxrv.amplifyapp.com%2Fdashboard_user.html&response_type=code&scope=email+openid+profile">
-      🔐 Register Securely with Cognito
-      </a>
-
+        <a href="#" onclick="window.location.href=signupUrl">🔐 Register </a>
+        <a href="#" onclick="window.location.href=loginUrl">🔐 Login </a>
+        
         <a href="about.html">About</a>
       </nav>
     </div>
@@ -101,6 +94,9 @@
   </section>
 
   <script>
+const signupUrl = "https://eu-north-1dogitdzli.auth.eu-north-1.amazoncognito.com/signup?client_id=2o0nmr5jkldo6ghja66ffvihra&redirect_uri=https%3A%2F%2Fmain.d10w39dyzelxrv.amplifyapp.com%2Fdashboard_user.html&response_type=code&scope=email+openid+phone";
+
+const loginUrl = "https://eu-north-1dogitdzli.auth.eu-north-1.amazoncognito.com/login?client_id=2o0nmr5jkldo6ghja66ffvihra&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fmain.d10w39dyzelxrv.amplifyapp.com%2Fdashboard_user.html";
 
 const forbiddenCountries = ["India", "Pakistan", "France", "Germany", "USA", "China", "Australia", "UK", "Spain", "Italy", "Canada", "Japan"];
 
