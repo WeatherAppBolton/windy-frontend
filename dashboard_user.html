@@ -238,12 +238,12 @@
 
   <script>
     // ✅ PART 1 OF 2
-  // -- AUTH, TOKEN EXCHANGE, ID TOKEN PARSE, DYNAMODB VALIDATION, DASHBOARD LOAD SETUP
 
   let userEmail = null;
   let currentUserData = {};
   let lastSearchedCity = null;
 
+  const clientSecret = "l1remjan3uumvk4eim1up8jsh5s02mjc49a3fpt52i0a9om8n1l";
   const clientId = "2o0nmr5jkldo6ghja66ffvihra";
   const domain = "eu-north-1dogitdzli";
   const region = "eu-north-1";
@@ -316,49 +316,59 @@
     }
   }
 
-  async function init() {
-    document.getElementById("loader").style.display = "block";
-    document.querySelector("main").style.display = "none";
+async function init() {
+  document.getElementById("loader").style.display = "block";
+  document.querySelector("main").style.display = "none";
 
-    if (code) {
-      // Handle OAuth token exchange
-      const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
-      const params = new URLSearchParams();
-      params.append("grant_type", "authorization_code");
-      params.append("client_id", clientId);
-      params.append("code", code);
-      params.append("redirect_uri", redirectUri);
+  if (code) {
+    // Step 1: Exchange code for tokens
+    const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
+    const basicAuth = btoa(`${clientId}:${clientSecret}`);
 
-      try {
-        const res = await fetch(tokenUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: params
-        });
-        const data = await res.json();
-        if (!data.id_token) throw new Error("Missing token response");
+    const params = new URLSearchParams();
+    params.append("grant_type", "authorization_code");
+    params.append("client_id", clientId);
+    params.append("code", code);
+    params.append("redirect_uri", redirectUri);
 
-        storeTokens(data);
-        const cleanUrl = window.location.origin + window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-        window.location.reload();
-        return;
-      } catch (err) {
-        console.error("❌ Login flow failed:", err);
-        document.getElementById("loader").textContent = "❌ Login failed. Please retry.";
-        return;
-      }
+    try {
+      const res = await fetch(tokenUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Authorization": `Basic ${basicAuth}`
+        },
+        body: params
+      });
+
+      const data = await res.json();
+      if (!data.id_token) throw new Error("Missing token response");
+
+      // Step 2: Store tokens, cleanup URL, reload
+      storeTokens(data);
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+      window.location.reload();
+      return;
+    } catch (err) {
+      console.error("❌ Login flow failed:", err);
+      document.getElementById("loader").textContent = "❌ Login failed. Please retry.";
+      return;
     }
-
-    userEmail = tryLoadFromStorage();
-    if (!userEmail) return clearTokensAndRedirect();
-
-    const userData = await fetchUserData(userEmail);
-    if (!userData) return clearTokensAndRedirect();
-
-    currentUserData = userData;
-    loadDashboard();
   }
+
+  // Step 3: Token from localStorage must be valid
+  userEmail = tryLoadFromStorage();
+  if (!userEmail) return clearTokensAndRedirect();
+
+  // Step 4: Check DB for user existence
+  const userData = await fetchUserData(userEmail);
+  if (!userData) return clearTokensAndRedirect();
+
+  // Step 5: Load user data into app
+  currentUserData = userData;
+  loadDashboard();
+}
 
   window.onload = init;
 
