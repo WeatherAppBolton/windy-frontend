@@ -321,41 +321,49 @@ async function init() {
   document.querySelector("main").style.display = "none";
 
   if (code) {
-    // Step 1: Exchange code for tokens
-    const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
-    const basicAuth = btoa(`${clientId}:${clientSecret}`);
+  // Step 1: Exchange code for tokens
+  const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
+  const basicAuth = btoa(`${clientId}:${clientSecret}`);
 
-    const params = new URLSearchParams();
-    params.append("grant_type", "authorization_code");
-    params.append("client_id", clientId);
-    params.append("code", code);
-    params.append("redirect_uri", redirectUri);
+  const params = new URLSearchParams();
+  params.append("grant_type", "authorization_code");
+  params.append("client_id", clientId);
+  params.append("code", code);
+  params.append("redirect_uri", redirectUri);
 
-    try {
-      const res = await fetch(tokenUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Authorization": `Basic ${basicAuth}`
-        },
-        body: params
-      });
+  // 🔍 DEBUG: Log outgoing request
+  console.log("📡 Fetching token from:", tokenUrl);
+  console.log("📦 Token Request Headers:", {
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Authorization": `Basic ${basicAuth}`
+  });
+  console.log("🧾 Token Request Body:", [...params.entries()]);
 
-      const data = await res.json();
-      if (!data.id_token) throw new Error("Missing token response");
+  try {
+    const res = await fetch(tokenUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": `Basic ${basicAuth}`
+      },
+      body: params
+    });
 
-      // Step 2: Store tokens, cleanup URL, reload
-      storeTokens(data);
-      const cleanUrl = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, cleanUrl);
-      window.location.reload();
-      return;
-    } catch (err) {
-      console.error("❌ Login flow failed:", err);
-      document.getElementById("loader").textContent = "❌ Login failed. Please retry.";
-      return;
-    }
+    const data = await res.json();
+    if (!data.id_token) throw new Error("Missing token response");
+
+    // Step 2: Store tokens, cleanup URL, reload
+    storeTokens(data);
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+    window.location.reload();
+    return;
+  } catch (err) {
+    console.error("❌ Login flow failed:", err);
+    document.getElementById("loader").textContent = "❌ Login failed. Please retry.";
+    return;
   }
+}
 
   // Step 3: Token from localStorage must be valid
   userEmail = tryLoadFromStorage();
