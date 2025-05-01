@@ -1,6 +1,7 @@
 # 🌦️ Windy - Frontend
 
 
+
 ## 🚀 Project Overview
 This is the **frontend** of the Windy Weather App — a **serverless weather forecast application** that fetches real-time weather data using the OpenWeather API.  
 It is built with vanilla **HTML, CSS, and JavaScript** and hosted on **AWS S3** (static site), or optionally via **AWS Amplify** with CI/CD enabled.
