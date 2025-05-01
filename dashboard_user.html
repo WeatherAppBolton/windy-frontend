@@ -239,6 +239,8 @@
   <script>
     // ✅ PART 1 OF 2
 
+  const lambdaWeatherUrl = "https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather";
+
   let userEmail = null;
   let currentUserData = {};
   let lastSearchedCity = null;
@@ -371,9 +373,9 @@
 
       // Clean the URL and reload WITHOUT the ?code=
       const cleanUrl = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, cleanUrl);
-      window.location.reload();  // 🔁 restart with clean state
+      window.location.replace(cleanUrl);
       return;
+
 
     } catch (err) {
       console.error("❌ Token exchange failed:", err);
