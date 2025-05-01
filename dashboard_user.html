@@ -191,7 +191,7 @@
 
   <main class="dashboard-container" style="display:none;">
     <h1>🌤️ Welcome, <span id="username">User</span></h1>
-  
+    <h2 id="welcomeName"></h2>
     <!-- Weather Search -->
     <section class="dashboard-section">
       <h3>🔍 Search Weather</h3>
@@ -258,6 +258,15 @@
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get("code");
 
+  function loadDashboard() {
+  document.getElementById("loader").style.display = "none";
+  document.querySelector("main").style.display = "block";
+  // Optionally render user name, theme, saved cities
+  renderSavedFavorites(currentUserData.favorites || []);
+  document.body.className = currentUserData.theme || "default";
+  document.getElementById("welcomeName").textContent = currentUserData.name || "User";
+}
+
   function isTokenExpired(idToken) {
     try {
       const payload = JSON.parse(atob(idToken.split('.')[1]));
@@ -297,13 +306,27 @@
   }
 
   function tryLoadFromStorage() {
-    const idToken = localStorage.getItem("id_token");
-    if (!idToken || isTokenExpired(idToken)) return null;
-    const email = decodeEmail(idToken);
-    if (!email) return null;
-    localStorage.setItem("loggedInEmail", email);
-    return email;
+  const idToken = localStorage.getItem("id_token");
+  if (!idToken) {
+    console.warn("⚠️ No token in localStorage.");
+    return null;
   }
+
+  if (isTokenExpired(idToken)) {
+    console.warn("⚠️ Token expired.");
+    return null;
+  }
+
+  const email = decodeEmail(idToken);
+  if (!email) {
+    console.warn("⚠️ Could not decode email.");
+    return null;
+  }
+
+  localStorage.setItem("loggedInEmail", email);
+  return email;
+}
+
 
   async function fetchUserData(email) {
     try {
@@ -320,24 +343,15 @@
   document.getElementById("loader").style.display = "block";
   document.querySelector("main").style.display = "none";
 
-  if (code) {
-    // Step 1: Exchange code for tokens
-    const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
-    const basicAuth = btoa(`${clientId}:${clientSecret}`);
+  const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
+  const basicAuth = btoa(`${clientId}:${clientSecret}`);
 
+  if (code) {
     const params = new URLSearchParams();
     params.append("grant_type", "authorization_code");
     params.append("client_id", clientId);
     params.append("code", code);
     params.append("redirect_uri", redirectUri);
-
-    // 🔍 DEBUG: Log outgoing request
-    console.log("📡 Fetching token from:", tokenUrl);
-    console.log("📦 Token Request Headers:", {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": `Basic ${basicAuth}`
-    });
-    console.log("🧾 Token Request Body:", [...params.entries()]);
 
     try {
       const res = await fetch(tokenUrl, {
@@ -352,33 +366,40 @@
       const data = await res.json();
       if (!data.id_token) throw new Error("Missing token response");
 
-      // Step 2: Store tokens, cleanup URL
-// Store tokens
-storeTokens(data);
-console.log("✅ Stored ID token:", localStorage.getItem("id_token"));
+      storeTokens(data);
+      console.log("✅ Token saved. Cleaning up URL...");
 
-// Clean up the URL (removes ?code=...)
-const cleanUrl = window.location.origin + window.location.pathname;
-window.history.replaceState({}, document.title, cleanUrl);
-
-// ✅ Instead of returning, continue directly
-userEmail = tryLoadFromStorage();
-if (!userEmail) return clearTokensAndRedirect();
-
-const userData = await fetchUserData(userEmail);
-if (!userData) return clearTokensAndRedirect();
-
-currentUserData = userData;
-loadDashboard();
-return;
+      // Clean the URL and reload WITHOUT the ?code=
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+      window.location.reload();  // 🔁 restart with clean state
+      return;
 
     } catch (err) {
-      console.error("❌ Login flow failed:", err);
-      document.getElementById("loader").textContent = "❌ Login failed. Please retry.";
+      console.error("❌ Token exchange failed:", err);
+      document.getElementById("loader").textContent = "❌ Login failed.";
       return;
     }
   }
+
+  // If already logged in and no ?code=, validate token
+  userEmail = tryLoadFromStorage();
+  if (!userEmail) {
+    console.warn("⚠️ Invalid or expired token.");
+    return clearTokensAndRedirect();
+  }
+
+  console.log("🔍 Checking DynamoDB for:", userEmail);
+  const userData = await fetchUserData(userEmail);
+  if (!userData) {
+    console.warn("⚠️ User not found in DB.");
+    return clearTokensAndRedirect();
+  }
+
+  currentUserData = userData;
+  loadDashboard();
 }
+
 
   window.onload = init;
 
