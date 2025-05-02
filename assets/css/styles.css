@@ -97,6 +97,26 @@ header {
   top: 51%;
 }
 
+
+@media (max-width: 768px) {
+  #text {
+      font-size: 3em;
+  }
+  #text1 {
+      font-size: 1em;
+  }
+}
+
+@media (max-width: 480px) {
+  #text {
+      font-size: 2.3em;
+  }
+  #text1 {
+      font-size: 0.9em;
+  }
+  
+}
+
 /* SECTION BELOW PARALLAX */
 .sec {
   background: #003329;
