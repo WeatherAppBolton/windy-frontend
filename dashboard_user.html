@@ -190,8 +190,8 @@
   </div>
 
   <main class="dashboard-container" style="display:none;">
-    <h1>🌤️ Welcome, <span id="username">User</span></h1>
-    <h2 id="welcomeName"></h2>
+    <h1>🌤️ Welcome, <span id="welcomeName">User</span></h1>
+
     <!-- Weather Search -->
     <section class="dashboard-section">
       <h3>🔍 Search Weather</h3>
@@ -261,12 +261,24 @@
   const code = urlParams.get("code");
 
   function loadDashboard() {
+
+    console.log("🌐 Rendering dashboard");
+if (!document.getElementById("welcomeName")) {
+  console.error("❌ welcomeName element missing!");
+}
+if (!document.querySelector(".dashboard-container")) {
+  console.error("❌ .dashboard-container not found!");
+}
+
+
   document.getElementById("loader").style.display = "none";
-  document.querySelector("main").style.display = "block";
+  document.querySelector(".dashboard-container").style.display = "block";
+  document.querySelector(".logout-container").style.display = "block";
+
   // Optionally render user name, theme, saved cities
   renderSavedFavorites(currentUserData.favorites || []);
   document.body.className = currentUserData.theme || "default";
-  document.getElementById("welcomeName").textContent = currentUserData.name || "User";
+  document.getElementById("welcomeName").textContent = currentUserData?.name?.trim() || "User";
 }
 
   function isTokenExpired(idToken) {
@@ -399,11 +411,13 @@
   }
 
   currentUserData = userData;
+  console.log("✅ Loaded user data:", currentUserData);
   loadDashboard();
 }
 
 
-  window.onload = init;
+window.addEventListener("DOMContentLoaded", init);
+
 
   function logoutUser() {
     clearTokensAndRedirect();
@@ -411,28 +425,30 @@
 
   // Part 2 – Functional Logic
 
-  function checkWeather() {
-    const city = document.getElementById("city").value.trim();
-    if (!city) return;
+function checkWeather() {
+  const city = document.getElementById("city").value.trim();
+  if (!city) return;
 
-    fetch(`${lambdaWeatherUrl}?location=${encodeURIComponent(city)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (!data || !data.temperature || !data.condition)
-          throw new Error("Invalid weather data");
+  fetch(`${lambdaWeatherUrl}?location=${encodeURIComponent(city)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || !data.temperature || !data.condition)
+        throw new Error("Invalid weather data");
 
-        lastSearchedCity = city;
-        document.getElementById("weatherResult").innerHTML = `
-          <h3>📍 ${data.location}</h3>
-          <p>🌡️ Temp: ${data.temperature}°C</p>
-          <p>🌦️ Condition: <em>${data.condition.charAt(0).toUpperCase() + data.condition.slice(1)}</em></p>
-        `;
-      })
-      .catch(() => {
-        lastSearchedCity = null;
-        document.getElementById("weatherResult").textContent = "❌ Could not fetch weather.";
-      });
-  }
+      lastSearchedCity = city;
+      document.getElementById("weatherResult").innerHTML = `
+        <h3>📍 ${data.location}</h3>
+        <p>🌡️ Temp: ${data.temperature}°C</p>
+        <p>🌦️ Condition: <em>${data.condition.charAt(0).toUpperCase() + data.condition.slice(1)}</em></p>
+      `;
+    })
+    .catch(err => {
+      lastSearchedCity = null;
+      console.error("❌ Weather fetch failed:", err);
+      document.getElementById("weatherResult").textContent = "❌ Error loading weather.";
+    });
+}
+
 
   function saveToFavorites() {
     const city = document.getElementById("city").value.trim();
