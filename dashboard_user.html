@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>☁️ Windy - User Dashboard</title>
@@ -270,9 +272,10 @@ if (!document.querySelector(".dashboard-container")) {
   console.error("❌ .dashboard-container not found!");
 }
 
-
   document.getElementById("loader").style.display = "none";
-  document.querySelector(".dashboard-container").style.display = "block";
+  const main = document.querySelector(".dashboard-container");
+  main.style.display = "block";
+  main.classList.add("loaded");
   document.querySelector(".logout-container").style.display = "block";
 
   // Optionally render user name, theme, saved cities
@@ -355,7 +358,7 @@ if (!document.querySelector(".dashboard-container")) {
 
   async function init() {
   document.getElementById("loader").style.display = "block";
-  document.querySelector("main").style.display = "none";
+  document.querySelector(".dashboard-container").style.display = "none";
 
   const tokenUrl = `https://${domain}.auth.${region}.amazoncognito.com/oauth2/token`;
   const basicAuth = btoa(`${clientId}:${clientSecret}`);
