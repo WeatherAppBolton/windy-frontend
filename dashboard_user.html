@@ -250,6 +250,36 @@
   background-color: #b71c1c;
 }
 
+.search-button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.action-btn {
+  min-width: 100px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #2e7d32;
+}
+
+.action-btn span {
+  margin-left: 4px;
+}
+
   </style>
   </head>
 
@@ -266,8 +296,10 @@
     <section class="dashboard-section">
       <h3>🔍 Search Weather</h3>
       <input type="text" id="city" placeholder="Enter a city..." />
-      <button onclick="checkWeather()">Search</button>
-      <button onclick="saveToFavorites()">⭐ Save</button>
+      <div class="search-button-group">
+        <button class="action-btn" onclick="checkWeather()">🔍 <span>Search</span></button>
+        <button class="action-btn" onclick="saveToFavorites()">⭐ <span>Save</span></button>
+      </div>      
     </section>
   
     <div id="weatherResult"></div>
