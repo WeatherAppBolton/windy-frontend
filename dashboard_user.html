@@ -545,7 +545,7 @@ function checkWeather() {
 
   function renderSavedFavorites(favs) {
     document.getElementById("savedCities").innerHTML = "";
-    document.getElementById("favCount").textContent = `${favs.length}/3`;
+    document.getElementById("favCount").textContent = `${favs.length}`;
 
     const fetches = favs.map(city => {
       return fetch(`${lambdaWeatherUrl}?location=${encodeURIComponent(city)}`)
