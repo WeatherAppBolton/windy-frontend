@@ -618,29 +618,32 @@ function checkWeather() {
     });
   }
 
-  function renderProfileUpdateForm() {
-    const option = document.getElementById("updateOption").value;
-    const container = document.getElementById("profileUpdateFields");
-    container.innerHTML = "";
+function renderProfileUpdateForm() {
+  const option = document.getElementById("updateOption").value;
+  const container = document.getElementById("profileUpdateFields");
+  let html = "";
 
-    if (option === "email" || option === "password") {
-      container.innerHTML += `<input type="password" id="currentPassword" placeholder="Enter current password" />`;
-    }
-
-    if (option === "name") {
-      container.innerHTML = `<input type="text" id="newName" placeholder="New name" />`;
-    } else if (option === "email") {
-      container.innerHTML = `
-        <input type="email" id="newEmail" placeholder="New email" />
-        <input type="email" id="confirmEmail" placeholder="Confirm email" />
-      `;
-    } else if (option === "password") {
-      container.innerHTML = `
-        <input type="password" id="newPassword" placeholder="New password" />
-        <input type="password" id="confirmPassword" placeholder="Confirm password" />
-      `;
-    }
+  if (option === "email" || option === "password") {
+    html += `<input type="password" id="currentPassword" placeholder="Enter current password" />`;
   }
+
+  if (option === "name") {
+    html += `<input type="text" id="newName" placeholder="New name" />`;
+  } else if (option === "email") {
+    html += `
+      <input type="email" id="newEmail" placeholder="New email" />
+      <input type="email" id="confirmEmail" placeholder="Confirm email" />
+    `;
+  } else if (option === "password") {
+    html += `
+      <input type="password" id="newPassword" placeholder="New password" />
+      <input type="password" id="confirmPassword" placeholder="Confirm password" />
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
 
   function submitProfileUpdate() {
   const option = document.getElementById("updateOption").value;
