@@ -254,7 +254,8 @@
   const redirectUri = "https://main.d10w39dyzelxrv.amplifyapp.com/dashboard_user.html";
 
   const loginUrl = `https://${domain}.auth.${region}.amazoncognito.com/login?client_id=${clientId}&response_type=code&scope=email+openid+profile&redirect_uri=${redirectUri}`;
-  const logoutUrl = `https://${domain}.auth.${region}.amazoncognito.com/logout?client_id=${clientId}&logout_uri=${redirectUri}`;
+  const homeUrl = "https://main.d10w39dyzelxrv.amplifyapp.com/index.html";
+  const logoutUrl = `https://${domain}.auth.${region}.amazoncognito.com/logout?client_id=${clientId}&logout_uri=${homeUrl}`;
 
   const GET_PREFS_URL = "https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/prefs";
   const UPDATE_PREFS_URL = "https://0838uo8kkf.execute-api.eu-north-1.amazonaws.com/prod/user/prefs";
@@ -305,7 +306,7 @@ if (!document.querySelector(".dashboard-container")) {
   }
 
   function redirectToLogin() {
-    window.location.href = `https://main.d10w39dyzelxrv.amplifyapp.com/`;
+    window.location.href = loginUrl;
   }
 
   function storeTokens(data) {
@@ -422,9 +423,11 @@ if (!document.querySelector(".dashboard-container")) {
 window.addEventListener("DOMContentLoaded", init);
 
 
-  function logoutUser() {
-    clearTokensAndRedirect();
-  }
+function logoutUser() {
+  localStorage.clear(); // Clear all relevant tokens
+  window.location.href = logoutUrl; // 🔁 Redirect to proper Cognito logout with `logout_uri`
+}
+
 
   // Part 2 – Functional Logic
 
