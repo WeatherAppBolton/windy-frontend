@@ -345,7 +345,8 @@
 
   const lambdaWeatherUrl = "https://qhn8b1r3k7.execute-api.eu-north-1.amazonaws.com/prod/weather";
 
-  let userEmail = null;
+  let userEmail = localStorage.getItem("loggedInEmail");
+
   let currentUserData = {};
   let lastSearchedCity = null;
 
@@ -618,100 +619,105 @@ function checkWeather() {
     });
   }
 
-function renderProfileUpdateForm() {
+  function renderProfileUpdateForm() {
   const option = document.getElementById("updateOption").value;
   const container = document.getElementById("profileUpdateFields");
   let html = "";
 
   if (option === "email" || option === "password") {
-    html += `<input type="password" id="currentPassword" placeholder="Enter current password" />`;
+    html += `<input type="password" id="currentPassword" placeholder="Enter current password" required />`;
   }
 
   if (option === "name") {
-    html += `<input type="text" id="newName" placeholder="New name" />`;
+    html += `<input type="text" id="newName" placeholder="New name" required />`;
   } else if (option === "email") {
     html += `
-      <input type="email" id="newEmail" placeholder="New email" />
-      <input type="email" id="confirmEmail" placeholder="Confirm email" />
+      <input type="email" id="newEmail" placeholder="New email" required />
+      <input type="email" id="confirmEmail" placeholder="Confirm email" required />
     `;
   } else if (option === "password") {
     html += `
-      <input type="password" id="newPassword" placeholder="New password" />
-      <input type="password" id="confirmPassword" placeholder="Confirm password" />
+      <input type="password" id="newPassword" placeholder="New password" required />
+      <input type="password" id="confirmPassword" placeholder="Confirm password" required />
     `;
   }
 
   container.innerHTML = html;
 }
 
-
-  function submitProfileUpdate() {
+function submitProfileUpdate() {
   const option = document.getElementById("updateOption").value;
   if (!option) return;
 
-  let updateObj = { email: userEmail };
+  const updateObj = { email: userEmail };
 
+  // Required for email or password updates
   const currentPassword = document.getElementById("currentPassword")?.value;
   if ((option === "email" || option === "password") && !currentPassword) {
-    return alert("Please enter your current password for verification.");
+    return alert("Please enter your current password.");
   }
   if (option === "email" || option === "password") {
     updateObj.currentPassword = currentPassword;
   }
 
+  // Name update
   if (option === "name") {
     const name = document.getElementById("newName").value.trim();
-    if (!name) return alert("Enter name");
+    if (!name) return alert("Enter a valid name.");
     updateObj.name = name;
   }
 
+  // Email update
   if (option === "email") {
     const newEmail = document.getElementById("newEmail").value.trim().toLowerCase();
-    const confirm = document.getElementById("confirmEmail").value.trim().toLowerCase();
-    if (newEmail !== confirm) return alert("Emails do not match.");
-    updateObj.email = newEmail;
+    const confirmEmail = document.getElementById("confirmEmail").value.trim().toLowerCase();
+    if (newEmail !== confirmEmail) return alert("Emails do not match.");
+
+    updateObj.newEmail = newEmail;
     updateObj.previousEmail = userEmail;
-    userEmail = newEmail;
-    localStorage.setItem("loggedInEmail", newEmail);
+    updateObj.email = userEmail; // Required for lookup
   }
 
+  // Password update
   if (option === "password") {
-    const pass = document.getElementById("newPassword").value;
-    const confirm = document.getElementById("confirmPassword").value;
-    if (pass !== confirm) return alert("Passwords do not match.");
+    const newPassword = document.getElementById("newPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    if (newPassword !== confirmPassword) return alert("Passwords do not match.");
 
     const pwValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,12}$/;
-    if (!pwValid.test(pass)) return alert("Password must be 8–12 chars, include upper, lower, digit, and special.");
-
-    updateObj.password = pass;
+    if (!pwValid.test(newPassword)) return alert("Password must be 8–12 chars, upper/lowercase, digit & special char.");
+    updateObj.password = newPassword;
   }
 
-  const updateUrl = UPDATE_COGNITO_URL;
-
-
-  fetch(updateUrl, {
+  fetch(UPDATE_COGNITO_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updateObj)
   })
-    .then(res => res.json())
-    .then(response => {
-      const updateFields = document.getElementById("profileUpdateFields");
-      updateFields.querySelectorAll("p").forEach(p => p.remove());
+  .then(async (res) => {
+    const data = await res.json();
 
-      updateFields.innerHTML +=
-        '<p style="color:green; font-size:0.9rem; margin-top:8px;">✔️ Profile updated!</p>';
+    if (!res.ok) throw new Error(data.message || "Update failed");
 
-      setTimeout(() => loadDashboard(), 1500);
-    })
-    .catch(err => {
-      console.error("Error updating profile:", err);
-      alert("❌ Update failed. Please try again.");
-    });
+    // Only update local state after success
+    if (option === "email") {
+      userEmail = updateObj.newEmail;
+      localStorage.setItem("loggedInEmail", userEmail);
+    }
+
+    const container = document.getElementById("profileUpdateFields");
+    container.querySelectorAll("p").forEach(p => p.remove());
+    container.innerHTML += `<p style="color:green; font-size:0.9rem; margin-top:8px;">✔️ ${data.message}</p>`;
+
+    setTimeout(() => loadDashboard(), 1500);
+  })
+  .catch((err) => {
+    console.error("Update failed:", err);
+    alert("❌ Update failed: " + err.message);
+  });
 }
 
-
-  function updatePrefs(prefs, callback) {
+function updatePrefs(prefs, callback) {
     fetch(UPDATE_PREFS_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -725,6 +731,13 @@ function renderProfileUpdateForm() {
     })
     .catch(err => console.error("Error updating preferences:", err));
   }
+
+
+
+
+
+
+
 
   function logoutUser() {
     localStorage.removeItem("loggedInEmail");
