@@ -182,6 +182,43 @@
     main.dashboard-container.loaded {
       opacity: 1;
     }
+    /* === Enhanced Favorites Section === */
+
+.favorites-section {
+  margin-top: 25px;
+  padding: 12px 0;
+  border-radius: 12px;
+}
+
+.favorites-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+
+.favorites-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: inherit;
+}
+
+.refresh-btn {
+  background-color: #388e3c;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.refresh-btn:hover {
+  background-color: #2e7d32;
+}
+
   </style>
   </head>
 
@@ -205,11 +242,13 @@
     <div id="weatherResult"></div>
   
     <!-- Favorites -->
-    <section class="dashboard-section">
-      <h3>❤️ Favorites (<span id="favCount">0/3</span>)</h3>
-      <button onclick="renderSaved()">🔁 Refresh</button>
-      <ul id="savedCities" class="fav-list"></ul>
-    </section>
+    <div class="favorites-section">
+      <div class="favorites-header">
+        <h3>❤️ Favorites (<span id="favCount">0</span>/3)</h3>
+        <button class="refresh-btn" onclick="renderSaved()">🔁 Refresh</button>
+      </div>
+      <ul id="savedCities"></ul>
+    </div>
   
     <!-- Profile -->
     <section class="dashboard-section">
