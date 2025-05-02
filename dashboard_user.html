@@ -182,41 +182,72 @@
     main.dashboard-container.loaded {
       opacity: 1;
     }
-    /* === Enhanced Favorites Section === */
-
-.favorites-section {
+    
+    .favorites-section {
   margin-top: 25px;
-  padding: 12px 0;
-  border-radius: 12px;
 }
 
 .favorites-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  padding: 0 2px;
+  margin-bottom: 12px;
+  padding: 0 4px;
 }
 
 .favorites-header h3 {
-  margin: 0;
   font-size: 1.05rem;
+  margin: 0;
   color: inherit;
 }
 
 .refresh-btn {
-  background-color: #388e3c;
+  background-color: #4caf50;
   color: white;
-  padding: 6px 12px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
+  transition: background-color 0.2s ease;
 }
 
 .refresh-btn:hover {
-  background-color: #2e7d32;
+  background-color: #388e3c;
+}
+
+.fav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fav-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.fav-list li button {
+  background-color: #e53935;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.fav-list li button:hover {
+  background-color: #b71c1c;
 }
 
   </style>
@@ -247,8 +278,8 @@
         <h3>❤️ Favorites (<span id="favCount">0</span>/3)</h3>
         <button class="refresh-btn" onclick="renderSaved()">🔁 Refresh</button>
       </div>
-      <ul id="savedCities"></ul>
-    </div>
+      <ul id="savedCities" class="fav-list"></ul>
+    </div>    
   
     <!-- Profile -->
     <section class="dashboard-section">
