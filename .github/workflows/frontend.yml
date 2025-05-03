@@ -1,4 +1,4 @@
-name: ✨ Build & Deploy Windy Frontend
+name: ✨ Build & Deploy Windy Frontend *
 
 on:
   push:
