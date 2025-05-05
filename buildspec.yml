@@ -10,7 +10,7 @@ phases:
   build:
     commands:
       - echo "🚀 Starting S3 sync"
-      - aws s3 sync . s3://windy-app2/ --delete
+      - aws s3 sync . s3://windy-artifact-bucket/ --delete
       - echo "✅ Deployment complete"
 
 artifacts:
