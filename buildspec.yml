@@ -9,9 +9,17 @@ phases:
 
   build:
     commands:
-      - echo "🚀 Starting S3 sync"
-      - aws s3 sync . s3://windy-artifact-bucket/ --delete
-      - echo "✅ Deployment complete"
+      - echo "📁 Listing current directory contents..."
+      - ls -al || echo "⚠️ No files found in build root"
+      - echo "🚀 Starting S3 sync to windy-artifact-bucket..."
+      - |
+        if aws s3 ls "s3://windy-artifact-bucket" >/dev/null 2>&1; then
+          aws s3 sync . s3://windy-artifact-bucket/ --delete
+          echo "✅ Deployment complete"
+        else
+          echo "❌ Bucket not found or access denied: windy-artifact-bucket"
+          exit 1
+        fi
 
 artifacts:
   files:
